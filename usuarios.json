@@ -1,0 +1,14 @@
+{
+    "gonzalo": {
+        "contraseña": "corpus",
+        "partidas_jugadas": 7,
+        "palabras_acertadas": 0,
+        "palabras_erradas": 0,
+        "victorias": 0,
+        "derrotas": 7,
+        "puntos": 0,
+        "tiempo_total": 0,
+        "tiempo_total_juego": 0,
+        "errores_totales_juego": 0
+    }
+}
