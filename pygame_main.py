@@ -17,7 +17,6 @@ from pygame_controlador import (
 
 from pygame_pantalla import dibujar_juego
 
-
 # ==========================
 # CONFIGURACIÓN GENERAL
 # ==========================
@@ -35,12 +34,10 @@ GRIS = (40, 40, 40)
 AZUL = (70, 130, 180)
 ROJO = (180, 60, 60)
 
-
 # ==========================
 # CARGA DE USUARIOS
 # ==========================
 usuarios = cargar_usuarios("usuarios.json")
-
 
 # ==========================
 # ESTADO GENERAL
@@ -55,14 +52,12 @@ usuario_actual = None
 clave_usuario = None
 input_activo = "usuario"
 
-
 # ==========================
 # ESTADO DEL JUEGO
 # ==========================
 estado_juego = None
 indice_palabra = 0
 lista_bases = list(PALABRAS.keys())
-
 
 # ==========================
 # RECTÁNGULOS
@@ -81,7 +76,6 @@ btn_salir = pygame.Rect(700, 480, 200, 55)
 btn_volver = pygame.Rect(700, 650, 240, 50)
 
 btn_atras = pygame.Rect(30, 30, 140, 45)
-
 
 # ==========================
 # FUNCIONES DE DIBUJO
@@ -275,6 +269,7 @@ while True:
         elif pantalla_actual == "jugando" and estado_juego:
             actualizar_tiempo(estado_juego)
 
+            # ---- TECLADO ----
             if evento.type == pygame.KEYDOWN:
                 if evento.key == pygame.K_BACKSPACE:
                     borrar_palabra(estado_juego)
@@ -284,6 +279,37 @@ while True:
                     letra = evento.unicode.lower()
                     if letra.isalpha():
                         agregar_letra(estado_juego, letra)
+
+            # ---- MOUSE CLICK ----
+            if evento.type == pygame.MOUSEBUTTONDOWN:
+                # ---- BOTONES PRINCIPALES ----
+                for nombre, boton in estado_juego["botones"].items():
+                    if boton.fue_clickeado(evento):
+                        if nombre == "shuffle":
+                            mezclar_letras(estado_juego)
+                        elif nombre == "clear":
+                            borrar_palabra(estado_juego)
+                        elif nombre == "submit":
+                            submit_palabra(estado_juego)
+
+                # ---- BOTONES DE COMODINES ----
+                for nombre, boton in estado_juego["botones_comodines"].items():
+                    if boton.fue_clickeado(evento):
+                        usar_comodin(estado_juego, nombre)
+
+                # ---- BOTONES DE FIN DE JUEGO ----
+                if estado_juego["estado"] in ("ganado", "perdido"):
+                    for nombre, boton in estado_juego["botones_fin"].items():
+                        if boton.fue_clickeado(evento):
+                            if nombre == "siguiente" and estado_juego["estado"] == "ganado":
+                                indice_palabra += 1
+                                if indice_palabra < len(lista_bases):
+                                    base = lista_bases[indice_palabra]
+                                    estado_juego = crear_estado_desde_palabras(base, PALABRAS[base])
+                                else:
+                                    pantalla_actual = "menu"
+                            elif nombre == "menu":
+                                pantalla_actual = "menu"
 
         # -------- ESTADÍSTICAS --------
         elif pantalla_actual == "estadisticas":
