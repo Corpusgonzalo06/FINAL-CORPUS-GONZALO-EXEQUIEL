@@ -5,17 +5,9 @@ from usuarios import cargar_usuarios, guardar_usuarios
 from estadisticas import inicializar_estadisticas
 from palabras import PALABRAS
 
-from pygame_controlador import (
-    crear_estado_desde_palabras,
-    agregar_letra,
-    borrar_palabra,
-    mezclar_letras,
-    submit_palabra,
-    actualizar_tiempo,
-    usar_comodin
-)
-
+from pygame_controlador import *
 from pygame_pantalla import dibujar_juego
+from pygame_botones import crear_botones_fin_juego  # <- necesario para fin de juego
 
 # ==========================
 # CONFIGURACIÓN GENERAL
@@ -67,12 +59,13 @@ rect_contrasena = pygame.Rect(650, 360, 300, 40)
 
 btn_login = pygame.Rect(700, 350, 200, 55)
 btn_registro = pygame.Rect(700, 430, 200, 55)
+btn_salir_juego = pygame.Rect(700, 550, 200, 55)  # nuevo botón salir desde inicio
 
 btn_submit = pygame.Rect(650, 430, 300, 50)
 
 btn_jugar = pygame.Rect(700, 320, 200, 55)
 btn_stats = pygame.Rect(700, 400, 200, 55)
-btn_salir = pygame.Rect(700, 480, 200, 55)
+btn_cerrar_sesion = pygame.Rect(700, 480, 200, 55)  # reemplaza salir en menú
 btn_volver = pygame.Rect(700, 650, 240, 50)
 
 btn_atras = pygame.Rect(30, 30, 140, 45)
@@ -91,14 +84,15 @@ def dibujar_inicio():
 
     pygame.draw.rect(pantalla, AZUL, btn_login)
     pygame.draw.rect(pantalla, AZUL, btn_registro)
+    pygame.draw.rect(pantalla, ROJO, btn_salir_juego)
 
     dibujar_texto("INICIAR SESIÓN", 720, 365)
     dibujar_texto("REGISTRARSE", 740, 445)
+    dibujar_texto("SALIR DEL JUEGO", 715, 565)
 
 
 def dibujar_login():
     pantalla.fill(GRIS)
-
     dibujar_texto("LOGIN", 760, 200)
     dibujar_texto("Usuario:", 550, 310)
     dibujar_texto("Contraseña:", 520, 370)
@@ -119,7 +113,6 @@ def dibujar_login():
 
 def dibujar_registro():
     pantalla.fill(GRIS)
-
     dibujar_texto("REGISTRO", 740, 200)
     dibujar_texto("Nuevo usuario:", 520, 310)
     dibujar_texto("Contraseña:", 520, 370)
@@ -140,21 +133,19 @@ def dibujar_registro():
 
 def dibujar_menu():
     pantalla.fill(GRIS)
-
     dibujar_texto(f"Bienvenido {clave_usuario}", 680, 200)
 
     pygame.draw.rect(pantalla, AZUL, btn_jugar)
     pygame.draw.rect(pantalla, AZUL, btn_stats)
-    pygame.draw.rect(pantalla, AZUL, btn_salir)
+    pygame.draw.rect(pantalla, ROJO, btn_cerrar_sesion)
 
     dibujar_texto("NUEVA PARTIDA", 720, 335)
     dibujar_texto("VER ESTADÍSTICAS", 705, 415)
-    dibujar_texto("SALIR", 770, 495)
+    dibujar_texto("CERRAR SESIÓN", 730, 495)
 
 
 def dibujar_estadisticas():
     pantalla.fill(GRIS)
-
     dibujar_texto("ESTADÍSTICAS", 720, 200)
 
     y = 260
@@ -191,6 +182,11 @@ while True:
                     contrasena_input = ""
                     mensaje = ""
                     pantalla_actual = "registro"
+
+                elif btn_salir_juego.collidepoint(evento.pos):
+                    guardar_usuarios("usuarios.json", usuarios)
+                    pygame.quit()
+                    sys.exit()
 
         # -------- LOGIN / REGISTRO --------
         elif pantalla_actual in ("login", "registro"):
@@ -260,10 +256,10 @@ while True:
                 elif btn_stats.collidepoint(evento.pos):
                     pantalla_actual = "estadisticas"
 
-                elif btn_salir.collidepoint(evento.pos):
-                    guardar_usuarios("usuarios.json", usuarios)
-                    pygame.quit()
-                    sys.exit()
+                elif btn_cerrar_sesion.collidepoint(evento.pos):
+                    usuario_actual = None
+                    clave_usuario = None
+                    pantalla_actual = "inicio"
 
         # -------- JUGANDO --------
         elif pantalla_actual == "jugando" and estado_juego:
@@ -299,6 +295,9 @@ while True:
 
                 # ---- BOTONES DE FIN DE JUEGO ----
                 if estado_juego["estado"] in ("ganado", "perdido"):
+                    if "botones_fin" not in estado_juego:
+                        estado_juego["botones_fin"] = crear_botones_fin_juego()
+
                     for nombre, boton in estado_juego["botones_fin"].items():
                         if boton.fue_clickeado(evento):
                             if nombre == "siguiente" and estado_juego["estado"] == "ganado":
