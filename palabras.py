@@ -1,5 +1,5 @@
 PALABRAS = {
-    "camisa": ["camisa", "cima", "masa", "mica", "casi", "asma", "misa", "sima", "saca", "as", "caia"],
+    "camisa": ["camisa", "cima", "masa", "mica", "casi", "asma", "misa", "saca", "as", "caia","cami" ],
     "platos": ["platos", "plato", "alto", "palo", "sol", "sal", "las", "sola", "paso", "pasto", "post", "talo", "topa", "ola", "tal", "ato"],
     "amigos": ["amigos", "amigo", "goma", "sima", "gas", "oiga", "sigo", "gamo", "mago", "soga", "isla", "mis", "asi"],
     "verdeo": ["verdeo", "verde", "ver", "red", "reo", "ore", "oido", "veo", "doy"],

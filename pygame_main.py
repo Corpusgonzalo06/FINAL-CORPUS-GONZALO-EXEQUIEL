@@ -1,10 +1,8 @@
 import pygame
 import sys
-
 from usuarios import cargar_usuarios, guardar_usuarios
 from estadisticas import inicializar_estadisticas
 from palabras import PALABRAS
-
 from pygame_controlador import *
 from pygame_pantalla import dibujar_juego
 from pygame_botones import crear_botones_fin_juego  # <- necesario para fin de juego
@@ -87,8 +85,8 @@ def dibujar_inicio():
     pygame.draw.rect(pantalla, ROJO, btn_salir_juego)
 
     dibujar_texto("INICIAR SESIÓN", 720, 365)
-    dibujar_texto("REGISTRARSE", 740, 445)
-    dibujar_texto("SALIR DEL JUEGO", 715, 565)
+    dibujar_texto("REGISTRARSE", 720, 445)
+    dibujar_texto("SALIR DEL JUEGO", 700, 555)
 
 
 def dibujar_login():
@@ -114,7 +112,7 @@ def dibujar_login():
 def dibujar_registro():
     pantalla.fill(GRIS)
     dibujar_texto("REGISTRO", 740, 200)
-    dibujar_texto("Nuevo usuario:", 520, 310)
+    dibujar_texto("Nuevo usuario:", 490, 310)
     dibujar_texto("Contraseña:", 520, 370)
 
     pygame.draw.rect(pantalla, BLANCO, rect_usuario, 2)
@@ -140,8 +138,8 @@ def dibujar_menu():
     pygame.draw.rect(pantalla, ROJO, btn_cerrar_sesion)
 
     dibujar_texto("NUEVA PARTIDA", 720, 335)
-    dibujar_texto("VER ESTADÍSTICAS", 705, 415)
-    dibujar_texto("CERRAR SESIÓN", 730, 495)
+    dibujar_texto("ESTADÍSTICAS", 720, 415)
+    dibujar_texto("CERRAR SESIÓN", 710, 495)
 
 
 def dibujar_estadisticas():
