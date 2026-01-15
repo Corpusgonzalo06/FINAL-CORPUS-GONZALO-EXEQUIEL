@@ -9,12 +9,11 @@ GRIS = (90, 90, 90)
 GRIS_OSCURO = (50, 50, 50)
 BLANCO = (255, 255, 255)
 
-
 # ==========================
 # CLASE BOTÓN
 # ==========================
 class Boton:
-    def __init__(self, x, y, ancho, alto, texto):
+    def __init__(self, x=0, y=0, ancho=150, alto=50, texto=""):
         self.rect = pygame.Rect(x, y, ancho, alto)
         self.texto = texto
         self.activo = True
@@ -66,34 +65,32 @@ class Boton:
             and self.rect.collidepoint(evento.pos)
         )
 
-
 # ==========================
 # BOTONES PRINCIPALES DEL JUEGO
 # ==========================
 def crear_botones_juego():
     return {
-        "shuffle": Boton(50, 400, 130, 45, "SHUFFLE"),
-        "clear": Boton(200, 400, 130, 45, "CLEAR"),
-        "submit": Boton(350, 400, 130, 45, "SUBMIT"),
+        "shuffle": Boton(texto="SHUFFLE"),
+        "clear": Boton(texto="CLEAR"),
+        "submit": Boton(texto="SUBMIT"),
     }
-
 
 # ==========================
 # BOTONES FINALES (WIN / LOSE)
 # ==========================
 def crear_botones_fin_juego():
+    # Devuelve siempre las claves "menu" y "siguiente"
     return {
-        "siguiente": Boton(250, 430, 220, 50, "SIGUIENTE NIVEL"),
-        "menu": Boton(500, 430, 220, 50, "VOLVER AL MENÚ"),
+        "menu": Boton(texto="VOLVER AL MENÚ"),
+        "siguiente": Boton(texto="SIGUIENTE NIVEL"),
     }
-
 
 # ==========================
 # BOTONES DE COMODINES
 # ==========================
 def crear_botones_comodines():
     return {
-        "revelar_palabra_base": Boton(550, 200, 220, 45, "🔍 Revelar base"),
-        "eliminar_restricciones": Boton(550, 260, 220, 45, "🚀 Sin perder vida"),
-        "pista_extra": Boton(550, 320, 220, 45, "🧠 Pista"),
+        "revelar_palabra_base": Boton(texto="🔍 Revelar base"),
+        "eliminar_restricciones": Boton(texto="🚀 Sin perder vida"),
+        "pista_extra": Boton(texto="🧠 Pista"),
     }

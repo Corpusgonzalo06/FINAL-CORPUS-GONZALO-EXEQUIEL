@@ -1,6 +1,6 @@
-# pygame_pantalla.py
 import pygame
 from pygame_botones import (
+    Boton,
     crear_botones_juego,
     crear_botones_comodines,
     crear_botones_fin_juego
@@ -11,11 +11,12 @@ from pygame_botones import (
 # ==========================
 BLANCO = (255, 255, 255)
 NEGRO = (20, 20, 20)
-GRIS = (35, 35, 35)
 GRIS_PANEL = (28, 28, 28)
 AZUL = (70, 130, 180)
 VERDE = (60, 180, 90)
 ROJO = (180, 60, 60)
+ROJO_OSCURO = (120, 30, 30)
+VERDE_OSCURO = (30, 100, 60)
 
 # ==========================
 # FUENTES
@@ -25,6 +26,10 @@ FUENTE = pygame.font.SysFont("arial", 24)
 FUENTE_MEDIANA = pygame.font.SysFont("arial", 28)
 FUENTE_GRANDE = pygame.font.SysFont("arial", 36)
 
+# ==========================
+# FONDO
+# ==========================
+FONDO_IMG = pygame.image.load("x2.jpg")
 
 # ==========================
 # AUXILIAR
@@ -33,28 +38,22 @@ def dibujar_texto(pantalla, texto, x, y, color=BLANCO, fuente=FUENTE):
     render = fuente.render(texto, True, color)
     pantalla.blit(render, (x, y))
 
-
 # ==========================
 # DIBUJO PRINCIPAL
 # ==========================
 def dibujar_juego(pantalla, estado):
 
     ancho, alto = pantalla.get_size()
-    pantalla.fill(GRIS)
+
+    # 🔹 FONDO
+    fondo_escalado = pygame.transform.scale(FONDO_IMG, (ancho, alto))
+    pantalla.blit(fondo_escalado, (0, 0))
 
     # ==========================
     # HEADER
     # ==========================
     pygame.draw.rect(pantalla, NEGRO, (0, 0, ancho, 90))
-
-    dibujar_texto(
-        pantalla,
-        "POP A WORD",
-        ancho // 2 - 90,
-        25,
-        BLANCO,
-        FUENTE_GRANDE
-    )
+    dibujar_texto(pantalla, "POP A WORD", ancho // 2 - 90, 25, BLANCO, FUENTE_GRANDE)
 
     info_x = 40
     dibujar_texto(pantalla, f"Nivel: {estado['nivel']}", info_x, 15)
@@ -136,24 +135,40 @@ def dibujar_juego(pantalla, estado):
         dibujar_texto(pantalla, letra.upper(), x - 8, y_letras - 12)
 
     # ==========================
-    # MENSAJE
+    # OVERLAY + MENSAJE DERROTA
     # ==========================
-    if estado["mensaje"]:
-        color = VERDE if estado["estado"] == "ganado" else ROJO
+    if estado["estado"] == "perdido":
+
+        overlay = pygame.Surface((ancho, alto), pygame.SRCALPHA)
+        overlay.fill((120, 0, 0, 120))
+        pantalla.blit(overlay, (0, 0))
+
+        panel_rect = pygame.Rect(centro_x - 20, 300, 400, 90)
+        pygame.draw.rect(pantalla, ROJO_OSCURO, panel_rect, border_radius=16)
+        pygame.draw.rect(pantalla, BLANCO, panel_rect, 2, border_radius=16)
+
         dibujar_texto(
             pantalla,
-            estado["mensaje"],
-            centro_x,
-            330,
-            color,
+            "💔 TE QUEDASTE SIN VIDAS",
+            panel_rect.x + 40,
+            panel_rect.y + 18,
+            BLANCO,
             FUENTE_MEDIANA
+        )
+
+        dibujar_texto(
+            pantalla,
+            "GAME OVER",
+            panel_rect.x + 140,
+            panel_rect.y + 55,
+            ROJO,
+            FUENTE
         )
 
     # ==========================
     # BOTONES DE JUEGO
     # ==========================
     if estado["estado"] == "jugando":
-
         if "botones" not in estado:
             estado["botones"] = crear_botones_juego()
 
@@ -166,34 +181,29 @@ def dibujar_juego(pantalla, estado):
             botones_x += 140
 
     # ==========================
-    # FIN DE JUEGO
+    # FIN DE JUEGO (BOTONES)
     # ==========================
     if estado["estado"] in ("ganado", "perdido"):
 
-        if "botones_fin" not in estado:
+        # Crear botones de fin si no existen
+        if "botones_fin" not in estado or not isinstance(estado["botones_fin"], dict):
             estado["botones_fin"] = crear_botones_fin_juego()
 
-        texto = "🎉 NIVEL COMPLETADO" if estado["estado"] == "ganado" else "😢 GAME OVER"
-        color = VERDE if estado["estado"] == "ganado" else ROJO
-
-        dibujar_texto(
-            pantalla,
-            texto,
-            centro_x,
-            480,
-            color,
-            FUENTE_GRANDE
-        )
+        # ⚡ Asegurar que las claves existan
+        if "menu" not in estado["botones_fin"]:
+            estado["botones_fin"]["menu"] = Boton(0, 0, 220, 50, "VOLVER AL MENÚ")
+        if "siguiente" not in estado["botones_fin"] and estado["estado"] == "ganado":
+            estado["botones_fin"]["siguiente"] = Boton(0, 0, 220, 50, "SIGUIENTE NIVEL")
 
         fin_y = 540
         fin_x = centro_x
 
-        # BOTÓN VOLVER AL MENÚ
+        # Dibujar botón "menu"
         boton_menu = estado["botones_fin"]["menu"]
         boton_menu.rect.topleft = (fin_x, fin_y)
         boton_menu.dibujar(pantalla, FUENTE)
 
-        # BOTÓN SIGUIENTE NIVEL (solo si ganó)
+        # Dibujar botón "siguiente" solo si ganó
         if estado["estado"] == "ganado":
             boton_sig = estado["botones_fin"]["siguiente"]
             boton_sig.rect.topleft = (fin_x + 240, fin_y)

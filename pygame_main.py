@@ -1,11 +1,12 @@
 import pygame
 import sys
+
 from usuarios import cargar_usuarios, guardar_usuarios
 from estadisticas import inicializar_estadisticas
 from palabras import PALABRAS
+
 from pygame_controlador import *
 from pygame_pantalla import dibujar_juego
-from pygame_botones import crear_botones_fin_juego  # <- necesario para fin de juego
 
 # ==========================
 # CONFIGURACIÓN GENERAL
@@ -17,20 +18,38 @@ pantalla = pygame.display.set_mode((ANCHO, ALTO))
 pygame.display.set_caption("Pop A Word")
 
 reloj = pygame.time.Clock()
-FUENTE = pygame.font.SysFont("arial", 28)
+FUENTE = pygame.font.SysFont("Brodway", 28)    
 
+# ==========================
+# COLORES
+# ==========================
 BLANCO = (255, 255, 255)
-GRIS = (40, 40, 40)
 AZUL = (70, 130, 180)
 ROJO = (180, 60, 60)
 
 # ==========================
-# CARGA DE USUARIOS
+# FONDO
+# ==========================
+FONDO_MENU = pygame.image.load("fondomenu.jpg")
+
+def dibujar_fondo_menu():
+    fondo = pygame.transform.scale(FONDO_MENU, (ANCHO, ALTO))
+    pantalla.blit(fondo, (0, 0))
+    overlay = pygame.Surface((ANCHO, ALTO), pygame.SRCALPHA)
+    overlay.fill((0, 0, 0, 140))
+    pantalla.blit(overlay, (0, 0))
+
+def dibujar_texto(texto, x, y, color=BLANCO):
+    render = FUENTE.render(texto, True, color)
+    pantalla.blit(render, (x, y))
+
+# ==========================
+# USUARIOS
 # ==========================
 usuarios = cargar_usuarios("usuarios.json")
 
 # ==========================
-# ESTADO GENERAL
+# ESTADOS
 # ==========================
 pantalla_actual = "inicio"
 
@@ -42,9 +61,6 @@ usuario_actual = None
 clave_usuario = None
 input_activo = "usuario"
 
-# ==========================
-# ESTADO DEL JUEGO
-# ==========================
 estado_juego = None
 indice_palabra = 0
 lista_bases = list(PALABRAS.keys())
@@ -52,109 +68,21 @@ lista_bases = list(PALABRAS.keys())
 # ==========================
 # RECTÁNGULOS
 # ==========================
-rect_usuario = pygame.Rect(650, 300, 300, 40)
+rect_usuario = pygame.Rect(650, 250, 300, 40)
 rect_contrasena = pygame.Rect(650, 360, 300, 40)
 
 btn_login = pygame.Rect(700, 350, 200, 55)
 btn_registro = pygame.Rect(700, 430, 200, 55)
-btn_salir_juego = pygame.Rect(700, 550, 200, 55)  # nuevo botón salir desde inicio
+btn_salir_juego = pygame.Rect(700, 550, 200, 55)
 
 btn_submit = pygame.Rect(650, 430, 300, 50)
 
 btn_jugar = pygame.Rect(700, 320, 200, 55)
 btn_stats = pygame.Rect(700, 400, 200, 55)
-btn_cerrar_sesion = pygame.Rect(700, 480, 200, 55)  # reemplaza salir en menú
+btn_cerrar_sesion = pygame.Rect(700, 480, 200, 55)
 btn_volver = pygame.Rect(700, 650, 240, 50)
 
 btn_atras = pygame.Rect(30, 30, 140, 45)
-
-# ==========================
-# FUNCIONES DE DIBUJO
-# ==========================
-def dibujar_texto(texto, x, y, color=BLANCO):
-    render = FUENTE.render(texto, True, color)
-    pantalla.blit(render, (x, y))
-
-
-def dibujar_inicio():
-    pantalla.fill(GRIS)
-    dibujar_texto("POP A WORD", 720, 200)
-
-    pygame.draw.rect(pantalla, AZUL, btn_login)
-    pygame.draw.rect(pantalla, AZUL, btn_registro)
-    pygame.draw.rect(pantalla, ROJO, btn_salir_juego)
-
-    dibujar_texto("INICIAR SESIÓN", 720, 365)
-    dibujar_texto("REGISTRARSE", 720, 445)
-    dibujar_texto("SALIR DEL JUEGO", 700, 555)
-
-
-def dibujar_login():
-    pantalla.fill(GRIS)
-    dibujar_texto("LOGIN", 760, 200)
-    dibujar_texto("Usuario:", 550, 310)
-    dibujar_texto("Contraseña:", 520, 370)
-
-    pygame.draw.rect(pantalla, BLANCO, rect_usuario, 2)
-    pygame.draw.rect(pantalla, BLANCO, rect_contrasena, 2)
-    pygame.draw.rect(pantalla, AZUL, btn_submit)
-
-    dibujar_texto(usuario_input, 660, 308)
-    dibujar_texto("*" * len(contrasena_input), 660, 368)
-    dibujar_texto("INGRESAR", 740, 445)
-
-    dibujar_texto(mensaje, 650, 500)
-
-    pygame.draw.rect(pantalla, ROJO, btn_atras)
-    dibujar_texto("VOLVER", 60, 42)
-
-
-def dibujar_registro():
-    pantalla.fill(GRIS)
-    dibujar_texto("REGISTRO", 740, 200)
-    dibujar_texto("Nuevo usuario:", 490, 310)
-    dibujar_texto("Contraseña:", 520, 370)
-
-    pygame.draw.rect(pantalla, BLANCO, rect_usuario, 2)
-    pygame.draw.rect(pantalla, BLANCO, rect_contrasena, 2)
-    pygame.draw.rect(pantalla, AZUL, btn_submit)
-
-    dibujar_texto(usuario_input, 660, 308)
-    dibujar_texto("*" * len(contrasena_input), 660, 368)
-    dibujar_texto("CREAR CUENTA", 715, 445)
-
-    dibujar_texto(mensaje, 650, 500)
-
-    pygame.draw.rect(pantalla, ROJO, btn_atras)
-    dibujar_texto("VOLVER", 60, 42)
-
-
-def dibujar_menu():
-    pantalla.fill(GRIS)
-    dibujar_texto(f"Bienvenido {clave_usuario}", 680, 200)
-
-    pygame.draw.rect(pantalla, AZUL, btn_jugar)
-    pygame.draw.rect(pantalla, AZUL, btn_stats)
-    pygame.draw.rect(pantalla, ROJO, btn_cerrar_sesion)
-
-    dibujar_texto("NUEVA PARTIDA", 720, 335)
-    dibujar_texto("ESTADÍSTICAS", 720, 415)
-    dibujar_texto("CERRAR SESIÓN", 710, 495)
-
-
-def dibujar_estadisticas():
-    pantalla.fill(GRIS)
-    dibujar_texto("ESTADÍSTICAS", 720, 200)
-
-    y = 260
-    for clave, valor in usuario_actual.items():
-        if clave != "contraseña":
-            dibujar_texto(f"{clave}: {valor}", 600, y)
-            y += 35
-
-    pygame.draw.rect(pantalla, AZUL, btn_volver)
-    dibujar_texto("VOLVER AL MENÚ", 715, 665)
-
 
 # ==========================
 # LOOP PRINCIPAL
@@ -192,19 +120,13 @@ while True:
                 if btn_atras.collidepoint(evento.pos):
                     pantalla_actual = "inicio"
                     mensaje = ""
-
                 elif rect_usuario.collidepoint(evento.pos):
                     input_activo = "usuario"
-
                 elif rect_contrasena.collidepoint(evento.pos):
                     input_activo = "contrasena"
-
                 elif btn_submit.collidepoint(evento.pos):
                     if pantalla_actual == "login":
-                        if (
-                            usuario_input in usuarios and
-                            usuarios[usuario_input]["contraseña"] == contrasena_input
-                        ):
+                        if usuario_input in usuarios and usuarios[usuario_input]["contraseña"] == contrasena_input:
                             clave_usuario = usuario_input
                             usuario_actual = usuarios[usuario_input]
                             inicializar_estadisticas(usuario_actual)
@@ -215,7 +137,7 @@ while True:
                     else:
                         if usuario_input in usuarios:
                             mensaje = "Ese usuario ya existe"
-                        elif usuario_input == "" or contrasena_input == "":
+                        elif not usuario_input or not contrasena_input:
                             mensaje = "Campos incompletos"
                         else:
                             usuarios[usuario_input] = {"contraseña": contrasena_input}
@@ -230,12 +152,6 @@ while True:
                         usuario_input = usuario_input[:-1]
                     else:
                         contrasena_input = contrasena_input[:-1]
-
-                elif evento.key == pygame.K_RETURN:
-                    pygame.event.post(
-                        pygame.event.Event(pygame.MOUSEBUTTONDOWN, pos=btn_submit.center)
-                    )
-
                 else:
                     if input_activo == "usuario":
                         usuario_input += evento.unicode
@@ -263,50 +179,33 @@ while True:
         elif pantalla_actual == "jugando" and estado_juego:
             actualizar_tiempo(estado_juego)
 
-            # ---- TECLADO ----
             if evento.type == pygame.KEYDOWN:
                 if evento.key == pygame.K_BACKSPACE:
                     borrar_palabra(estado_juego)
                 elif evento.key == pygame.K_RETURN:
                     submit_palabra(estado_juego)
-                else:
-                    letra = evento.unicode.lower()
-                    if letra.isalpha():
-                        agregar_letra(estado_juego, letra)
+                elif evento.unicode.isalpha():
+                    agregar_letra(estado_juego, evento.unicode.lower())
 
-            # ---- MOUSE CLICK ----
             if evento.type == pygame.MOUSEBUTTONDOWN:
-                # ---- BOTONES PRINCIPALES ----
-                for nombre, boton in estado_juego["botones"].items():
+                for boton in estado_juego.get("botones", {}).values():
                     if boton.fue_clickeado(evento):
-                        if nombre == "shuffle":
+                        if boton.texto == "SHUFFLE":
                             mezclar_letras(estado_juego)
-                        elif nombre == "clear":
+                        elif boton.texto == "CLEAR":
                             borrar_palabra(estado_juego)
-                        elif nombre == "submit":
+                        elif boton.texto == "SUBMIT":
                             submit_palabra(estado_juego)
 
-                # ---- BOTONES DE COMODINES ----
-                for nombre, boton in estado_juego["botones_comodines"].items():
+                for nombre, boton in estado_juego.get("botones_comodines", {}).items():
                     if boton.fue_clickeado(evento):
                         usar_comodin(estado_juego, nombre)
 
-                # ---- BOTONES DE FIN DE JUEGO ----
                 if estado_juego["estado"] in ("ganado", "perdido"):
-                    if "botones_fin" not in estado_juego:
-                        estado_juego["botones_fin"] = crear_botones_fin_juego()
-
-                    for nombre, boton in estado_juego["botones_fin"].items():
+                    for nombre, boton in estado_juego.get("botones_fin", {}).items():
                         if boton.fue_clickeado(evento):
-                            if nombre == "siguiente" and estado_juego["estado"] == "ganado":
-                                indice_palabra += 1
-                                if indice_palabra < len(lista_bases):
-                                    base = lista_bases[indice_palabra]
-                                    estado_juego = crear_estado_desde_palabras(base, PALABRAS[base])
-                                else:
-                                    pantalla_actual = "menu"
-                            elif nombre == "menu":
-                                pantalla_actual = "menu"
+                            pantalla_actual = "menu"
+                            estado_juego = None
 
         # -------- ESTADÍSTICAS --------
         elif pantalla_actual == "estadisticas":
@@ -315,20 +214,51 @@ while True:
                     pantalla_actual = "menu"
 
     # ==========================
-    # DIBUJO GENERAL
+    # DIBUJO
     # ==========================
+    pantalla.fill((0, 0, 0))
+    dibujar_fondo_menu()
+
     if pantalla_actual == "inicio":
-        dibujar_inicio()
+        pygame.draw.rect(pantalla, AZUL, btn_login)
+        pygame.draw.rect(pantalla, AZUL, btn_registro)
+        pygame.draw.rect(pantalla, ROJO, btn_salir_juego)
+
+        dibujar_texto("INICIAR SESIÓN", btn_login.x + 20, btn_login.y + 15)
+        dibujar_texto("REGISTRARSE", btn_registro.x + 25, btn_registro.y + 15)
+        dibujar_texto("SALIR", btn_salir_juego.x + 75, btn_salir_juego.y + 15)
+
     elif pantalla_actual == "login":
-        dibujar_login()
-    elif pantalla_actual == "registro":
-        dibujar_registro()
+        pygame.draw.rect(pantalla, BLANCO, rect_usuario, 2)
+        pygame.draw.rect(pantalla, BLANCO, rect_contrasena, 2)
+        pygame.draw.rect(pantalla, AZUL, btn_submit)
+        pygame.draw.rect(pantalla, AZUL, btn_atras)
+
+        dibujar_texto("Usuario:", rect_usuario.x, rect_usuario.y - 30)
+        dibujar_texto(usuario_input, rect_usuario.x + 10, rect_usuario.y + 5)
+
+        dibujar_texto("Contraseña:", rect_contrasena.x, rect_contrasena.y - 30)
+        dibujar_texto("*" * len(contrasena_input), rect_contrasena.x + 10, rect_contrasena.y + 5)
+
+        dibujar_texto("ENTRAR", btn_submit.x + 100, btn_submit.y + 15)
+        dibujar_texto("ATRÁS", btn_atras.x + 30, btn_atras.y + 10)
+        dibujar_texto(mensaje, 650, 500, ROJO)
+
     elif pantalla_actual == "menu":
-        dibujar_menu()
+        pygame.draw.rect(pantalla, AZUL, btn_jugar)
+        pygame.draw.rect(pantalla, AZUL, btn_stats)
+        pygame.draw.rect(pantalla, ROJO, btn_cerrar_sesion)
+
+        dibujar_texto("JUGAR", btn_jugar.x + 70, btn_jugar.y + 15)
+        dibujar_texto("ESTADÍSTICAS", btn_stats.x + 30, btn_stats.y + 15)
+        dibujar_texto("CERRAR SESIÓN", btn_cerrar_sesion.x + 20, btn_cerrar_sesion.y + 15)
+
     elif pantalla_actual == "jugando" and estado_juego:
         dibujar_juego(pantalla, estado_juego)
+
     elif pantalla_actual == "estadisticas":
-        dibujar_estadisticas()
+        pygame.draw.rect(pantalla, AZUL, btn_volver)
+        dibujar_texto("VOLVER", btn_volver.x + 70, btn_volver.y + 15)
 
     pygame.display.update()
     reloj.tick(60)
