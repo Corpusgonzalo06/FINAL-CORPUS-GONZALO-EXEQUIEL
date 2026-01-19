@@ -6,7 +6,19 @@
         "palabras_erradas": 0,
         "victorias": 0,
         "derrotas": 7,
-        "puntos": 0,
+        "puntos": 14,
+        "tiempo_total": 0,
+        "tiempo_total_juego": 0,
+        "errores_totales_juego": 0
+    },
+    "santy": {
+        "contraseña": "corpu",
+        "partidas_jugadas": 0,
+        "palabras_acertadas": 0,
+        "palabras_erradas": 0,
+        "victorias": 0,
+        "derrotas": 0,
+        "puntos": 10,
         "tiempo_total": 0,
         "tiempo_total_juego": 0,
         "errores_totales_juego": 0

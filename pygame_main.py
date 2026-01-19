@@ -3,6 +3,7 @@ import sys
 
 from usuarios import cargar_usuarios, guardar_usuarios
 from estadisticas import inicializar_estadisticas
+from pygame_estadisticas import mostrar_estadisticas
 from palabras import PALABRAS
 
 from pygame_controlador import *
@@ -18,7 +19,12 @@ pantalla = pygame.display.set_mode((ANCHO, ALTO))
 pygame.display.set_caption("Pop A Word")
 
 reloj = pygame.time.Clock()
-FUENTE = pygame.font.SysFont("Brodway", 28)    
+FUENTE = pygame.font.SysFont("Brodway", 28)
+
+# ==========================
+# CONFIG PARTIDA
+# ==========================
+NIVEL_MAXIMO = 5
 
 # ==========================
 # COLORES
@@ -80,7 +86,6 @@ btn_submit = pygame.Rect(650, 430, 300, 50)
 btn_jugar = pygame.Rect(700, 320, 200, 55)
 btn_stats = pygame.Rect(700, 400, 200, 55)
 btn_cerrar_sesion = pygame.Rect(700, 480, 200, 55)
-btn_volver = pygame.Rect(700, 650, 240, 50)
 
 btn_atras = pygame.Rect(30, 30, 140, 45)
 
@@ -90,7 +95,7 @@ btn_atras = pygame.Rect(30, 30, 140, 45)
 while True:
     for evento in pygame.event.get():
         if evento.type == pygame.QUIT:
-            guardar_usuarios("usuarios.json", usuarios)
+            guardar_usuarios(usuarios, "usuarios.json")
             pygame.quit()
             sys.exit()
 
@@ -110,7 +115,7 @@ while True:
                     pantalla_actual = "registro"
 
                 elif btn_salir_juego.collidepoint(evento.pos):
-                    guardar_usuarios("usuarios.json", usuarios)
+                    guardar_usuarios(usuarios, "usuarios.json")
                     pygame.quit()
                     sys.exit()
 
@@ -120,10 +125,13 @@ while True:
                 if btn_atras.collidepoint(evento.pos):
                     pantalla_actual = "inicio"
                     mensaje = ""
+
                 elif rect_usuario.collidepoint(evento.pos):
                     input_activo = "usuario"
+
                 elif rect_contrasena.collidepoint(evento.pos):
                     input_activo = "contrasena"
+
                 elif btn_submit.collidepoint(evento.pos):
                     if pantalla_actual == "login":
                         if usuario_input in usuarios and usuarios[usuario_input]["contraseña"] == contrasena_input:
@@ -142,7 +150,7 @@ while True:
                         else:
                             usuarios[usuario_input] = {"contraseña": contrasena_input}
                             inicializar_estadisticas(usuarios[usuario_input])
-                            guardar_usuarios("usuarios.json", usuarios)
+                            guardar_usuarios(usuarios, "usuarios.json")
                             pantalla_actual = "login"
                             mensaje = "Usuario creado ✔"
 
@@ -164,11 +172,18 @@ while True:
                 if btn_jugar.collidepoint(evento.pos):
                     indice_palabra = 0
                     base = lista_bases[indice_palabra]
-                    estado_juego = crear_estado_desde_palabras(base, PALABRAS[base])
+
+                    estado_juego = crear_estado_desde_palabras(
+                        base,
+                        PALABRAS[base],
+                        nivel=1
+                    )
+
+                    estado_juego["usuario"] = clave_usuario
                     pantalla_actual = "jugando"
 
                 elif btn_stats.collidepoint(evento.pos):
-                    pantalla_actual = "estadisticas"
+                    pantalla_actual = mostrar_estadisticas(pantalla, usuario_actual)
 
                 elif btn_cerrar_sesion.collidepoint(evento.pos):
                     usuario_actual = None
@@ -202,16 +217,26 @@ while True:
                         usar_comodin(estado_juego, nombre)
 
                 if estado_juego["estado"] in ("ganado", "perdido"):
-                    for nombre, boton in estado_juego.get("botones_fin", {}).items():
+                    for boton in estado_juego.get("botones_fin", {}).values():
                         if boton.fue_clickeado(evento):
-                            pantalla_actual = "menu"
-                            estado_juego = None
 
-        # -------- ESTADÍSTICAS --------
-        elif pantalla_actual == "estadisticas":
-            if evento.type == pygame.MOUSEBUTTONDOWN:
-                if btn_volver.collidepoint(evento.pos):
-                    pantalla_actual = "menu"
+                            usuarios[clave_usuario]["puntos"] = estado_juego["puntaje"]
+                            guardar_usuarios(usuarios, "usuarios.json")
+
+                            if estado_juego["estado"] == "ganado" and estado_juego["nivel"] < NIVEL_MAXIMO:
+                                indice_palabra += 1
+                                base = lista_bases[indice_palabra]
+                                estado_juego = crear_estado_desde_palabras(
+                                    base,
+                                    PALABRAS[base],
+                                    nivel=estado_juego["nivel"] + 1,
+                                    puntaje=estado_juego["puntaje"],
+                                    vidas=estado_juego["vidas"]
+                                )
+                                estado_juego["usuario"] = clave_usuario
+                            else:
+                                pantalla_actual = "menu"
+                                estado_juego = None
 
     # ==========================
     # DIBUJO
@@ -228,23 +253,31 @@ while True:
         dibujar_texto("REGISTRARSE", btn_registro.x + 25, btn_registro.y + 15)
         dibujar_texto("SALIR", btn_salir_juego.x + 75, btn_salir_juego.y + 15)
 
-    elif pantalla_actual == "login":
+    elif pantalla_actual in ("login", "registro"):
+        titulo = "INICIAR SESIÓN" if pantalla_actual == "login" else "REGISTRO"
+
         pygame.draw.rect(pantalla, BLANCO, rect_usuario, 2)
         pygame.draw.rect(pantalla, BLANCO, rect_contrasena, 2)
         pygame.draw.rect(pantalla, AZUL, btn_submit)
         pygame.draw.rect(pantalla, AZUL, btn_atras)
 
+        dibujar_texto(titulo, 680, 200)
         dibujar_texto("Usuario:", rect_usuario.x, rect_usuario.y - 30)
         dibujar_texto(usuario_input, rect_usuario.x + 10, rect_usuario.y + 5)
 
         dibujar_texto("Contraseña:", rect_contrasena.x, rect_contrasena.y - 30)
         dibujar_texto("*" * len(contrasena_input), rect_contrasena.x + 10, rect_contrasena.y + 5)
 
-        dibujar_texto("ENTRAR", btn_submit.x + 100, btn_submit.y + 15)
+        dibujar_texto("CONFIRMAR", btn_submit.x + 80, btn_submit.y + 12)
         dibujar_texto("ATRÁS", btn_atras.x + 30, btn_atras.y + 10)
         dibujar_texto(mensaje, 650, 500, ROJO)
 
     elif pantalla_actual == "menu":
+        if clave_usuario:
+            texto = FUENTE.render(f"👋 Bienvenido, {clave_usuario}", True, BLANCO)
+            rect = texto.get_rect(center=(ANCHO // 2, 80))
+            pantalla.blit(texto, rect)
+
         pygame.draw.rect(pantalla, AZUL, btn_jugar)
         pygame.draw.rect(pantalla, AZUL, btn_stats)
         pygame.draw.rect(pantalla, ROJO, btn_cerrar_sesion)
@@ -255,10 +288,6 @@ while True:
 
     elif pantalla_actual == "jugando" and estado_juego:
         dibujar_juego(pantalla, estado_juego)
-
-    elif pantalla_actual == "estadisticas":
-        pygame.draw.rect(pantalla, AZUL, btn_volver)
-        dibujar_texto("VOLVER", btn_volver.x + 70, btn_volver.y + 15)
 
     pygame.display.update()
     reloj.tick(60)

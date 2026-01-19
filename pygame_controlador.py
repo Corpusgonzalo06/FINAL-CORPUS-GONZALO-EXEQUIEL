@@ -11,7 +11,7 @@ def crear_estado_desde_palabras(palabra_base, lista_palabras, nivel=1, puntaje=0
     for palabra in lista_palabras:
         pistas.append("_ " * len(palabra))
 
-    TIEMPO_POR_NIVEL = 60
+    TIEMPO_POR_NIVEL = 180
 
     return {
         "nivel": nivel,
@@ -24,17 +24,26 @@ def crear_estado_desde_palabras(palabra_base, lista_palabras, nivel=1, puntaje=0
         "puntaje": puntaje,
         "vidas": vidas,
 
-        # estados posibles: jugando | ganado | perdido
+        # estados: jugando | ganado | perdido
         "estado": "jugando",
 
+        # comodines
         "comodines": crear_comodines_iniciales(),
         "intento_libre": False,
-        "mensaje": "",
 
-        # ⏱️ TIEMPO
+        # feedback visual
+        "mensaje": "",
+        "ultimo_feedback": "",
+
+        # tiempo
         "tiempo_inicio": time.time(),
         "tiempo_limite": TIEMPO_POR_NIVEL,
-        "tiempo_restante": TIEMPO_POR_NIVEL
+        "tiempo_restante": TIEMPO_POR_NIVEL,
+
+        # resumen final (se completa al terminar la partida)
+        "nivel_maximo": None,
+        "puntaje_final": None,
+        "tiempo_final": None
     }
 
 
@@ -76,7 +85,7 @@ def usar_comodin(estado, nombre_comodin):
 
     elif nombre_comodin == "pista_extra":
         letra = estado["palabra_base"][0].lower()
-        estado["mensaje"] = f"🕵️ Una palabra empieza con '{letra}'"
+        estado["mensaje"] = f"🕵️ Empieza con '{letra}'"
 
     estado["comodines"][nombre_comodin] = False
 
@@ -90,33 +99,53 @@ def submit_palabra(estado):
 
     palabra = estado["palabra_actual"]
 
+    # PALABRA CORRECTA
     if palabra in estado["palabras_validas"]:
         if palabra not in estado["palabras_encontradas"]:
             estado["palabras_encontradas"].append(palabra)
-            estado["puntaje"] += len(palabra)
-            estado["mensaje"] = "✔ Palabra correcta"
+
+            puntos = len(palabra)
+            estado["puntaje"] += puntos
+
+            estado["mensaje"] = f"🔥 +{puntos} puntos!"
+            estado["ultimo_feedback"] = "bien"
 
             indice = estado["palabras_validas"].index(palabra)
             estado["pistas"][indice] = " ".join(palabra.upper())
 
-            # 🔥 TODAS LAS PALABRAS COMPLETADAS → GANADO
+            # NIVEL COMPLETADO
             if all("_" not in pista for pista in estado["pistas"]):
                 estado["estado"] = "ganado"
-                estado["mensaje"] = "🎉 NIVEL COMPLETADO"
+                estado["mensaje"] = "🎉 ¡NIVEL COMPLETADO!"
+
+                # resumen final
+                estado["nivel_maximo"] = estado["nivel"]
+                estado["puntaje_final"] = estado["puntaje"]
+                estado["tiempo_final"] = estado["tiempo_restante"]
+
         else:
-            estado["mensaje"] = "⚠️ Ya encontrada"
+            estado["mensaje"] = "⚠️ Ya la encontraste"
+            estado["ultimo_feedback"] = "neutral"
+
+    # PALABRA INCORRECTA
     else:
         if estado["intento_libre"]:
             estado["mensaje"] = "🚀 Intento libre usado"
             estado["intento_libre"] = False
         else:
             estado["vidas"] -= 1
-            estado["mensaje"] = "❌ Palabra incorrecta"
+            estado["mensaje"] = "❌ Ups, probá otra"
+            estado["ultimo_feedback"] = "mal"
 
-        # 💀 SIN VIDAS → PERDIDO
+        # SIN VIDAS
         if estado["vidas"] <= 0:
             estado["estado"] = "perdido"
             estado["mensaje"] = "💀 Te quedaste sin vidas"
+
+            # resumen final
+            estado["nivel_maximo"] = estado["nivel"]
+            estado["puntaje_final"] = estado["puntaje"]
+            estado["tiempo_final"] = estado["tiempo_restante"]
 
     estado["palabra_actual"] = ""
 
@@ -128,9 +157,7 @@ def actualizar_tiempo(estado):
     if estado["estado"] != "jugando":
         return
 
-    tiempo_actual = time.time()
-    transcurrido = tiempo_actual - estado["tiempo_inicio"]
-
+    transcurrido = time.time() - estado["tiempo_inicio"]
     restante = estado["tiempo_limite"] - int(transcurrido)
     estado["tiempo_restante"] = max(0, restante)
 
@@ -138,18 +165,22 @@ def actualizar_tiempo(estado):
         estado["estado"] = "perdido"
         estado["mensaje"] = "⏰ Tiempo agotado"
 
+        # resumen final
+        estado["nivel_maximo"] = estado["nivel"]
+        estado["puntaje_final"] = estado["puntaje"]
+        estado["tiempo_final"] = 0
+
 
 # ==========================
-# SIGUIENTE NIVEL
+# SIGUIENTE NIVEL (opcional)
 # ==========================
 def crear_siguiente_nivel(estado_actual, palabra_base, lista_palabras):
-    """
-    Solo debe llamarse si el estado anterior fue 'ganado'
-    """
-    return crear_estado_desde_palabras(
+    nuevo_estado = crear_estado_desde_palabras(
         palabra_base,
         lista_palabras,
         estado_actual["nivel"] + 1,
         estado_actual["puntaje"],
         estado_actual["vidas"]
     )
+
+    return nuevo_estado

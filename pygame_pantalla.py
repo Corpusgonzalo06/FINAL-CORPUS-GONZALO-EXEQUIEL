@@ -1,10 +1,10 @@
 import pygame
 from pygame_botones import (
-    Boton,
     crear_botones_juego,
     crear_botones_comodines,
     crear_botones_fin_juego
 )
+from usuarios import cargar_usuarios
 
 # ==========================
 # COLORES
@@ -15,8 +15,7 @@ GRIS_PANEL = (28, 28, 28)
 AZUL = (70, 130, 180)
 VERDE = (60, 180, 90)
 ROJO = (180, 60, 60)
-ROJO_OSCURO = (120, 30, 30)
-VERDE_OSCURO = (30, 100, 60)
+AMARILLO = (230, 200, 60)
 
 # ==========================
 # FUENTES
@@ -24,7 +23,9 @@ VERDE_OSCURO = (30, 100, 60)
 pygame.font.init()
 FUENTE = pygame.font.SysFont("arial", 24)
 FUENTE_MEDIANA = pygame.font.SysFont("arial", 28)
-FUENTE_GRANDE = pygame.font.SysFont("arial", 36)
+FUENTE_GRANDE = pygame.font.SysFont("arial", 38, bold=True)
+FUENTE_TIMER = pygame.font.SysFont("arial", 48, bold=True)
+FUENTE_NIVEL = pygame.font.SysFont("arial", 30, bold=True)
 
 # ==========================
 # FONDO
@@ -38,6 +39,7 @@ def dibujar_texto(pantalla, texto, x, y, color=BLANCO, fuente=FUENTE):
     render = fuente.render(texto, True, color)
     pantalla.blit(render, (x, y))
 
+
 # ==========================
 # DIBUJO PRINCIPAL
 # ==========================
@@ -45,39 +47,40 @@ def dibujar_juego(pantalla, estado):
 
     ancho, alto = pantalla.get_size()
 
-    # 🔹 FONDO
-    fondo_escalado = pygame.transform.scale(FONDO_IMG, (ancho, alto))
-    pantalla.blit(fondo_escalado, (0, 0))
+    # ==========================
+    # FONDO
+    # ==========================
+    fondo = pygame.transform.scale(FONDO_IMG, (ancho, alto))
+    pantalla.blit(fondo, (0, 0))
 
     # ==========================
     # HEADER
     # ==========================
-    pygame.draw.rect(pantalla, NEGRO, (0, 0, ancho, 90))
-    dibujar_texto(pantalla, "POP A WORD", ancho // 2 - 90, 25, BLANCO, FUENTE_GRANDE)
+    pygame.draw.rect(pantalla, NEGRO, (0, 0, ancho, 100))
 
-    info_x = 40
-    dibujar_texto(pantalla, f"Nivel: {estado['nivel']}", info_x, 15)
-    dibujar_texto(pantalla, f"Puntaje: {estado['puntaje']}", info_x, 45)
-    dibujar_texto(pantalla, f"Vidas: {estado['vidas']}", info_x + 180, 15)
+    dibujar_texto(pantalla, "POP A WORD", ancho // 2 - 140, 15, BLANCO, FUENTE_GRANDE)
+    dibujar_texto(pantalla, f"NIVEL {estado['nivel']}", ancho // 2 - 60, 58, AZUL, FUENTE_NIVEL)
 
-    color_tiempo = VERDE if estado["tiempo_restante"] > 10 else ROJO
-    dibujar_texto(
-        pantalla,
-        f"⏱ {estado['tiempo_restante']}s",
-        info_x + 180,
-        45,
-        color_tiempo
-    )
+    dibujar_texto(pantalla, f"Puntaje: {estado['puntaje']}", 30, 20)
+    dibujar_texto(pantalla, f"Vidas: {estado['vidas']}", 30, 55)
+
+    # ==========================
+    # ⏱️ TEMPORIZADOR
+    # ==========================
+    tiempo = estado["tiempo_restante"]
+
+    color_tiempo = VERDE if tiempo > 20 else AMARILLO if tiempo > 10 else ROJO
+    dibujar_texto(pantalla, f"{tiempo}s", ancho - 150, 30, color_tiempo, FUENTE_TIMER)
 
     # ==========================
     # PANEL DERECHO
     # ==========================
     panel_x = ancho - 360
-    pygame.draw.rect(pantalla, GRIS_PANEL, (panel_x, 90, 360, alto - 90))
+    pygame.draw.rect(pantalla, GRIS_PANEL, (panel_x, 100, 360, alto - 100))
 
-    dibujar_texto(pantalla, "PALABRAS", panel_x + 30, 110, AZUL, FUENTE_MEDIANA)
+    dibujar_texto(pantalla, "PALABRAS", panel_x + 30, 120, AZUL, FUENTE_MEDIANA)
 
-    y = 150
+    y = 160
     for pista in estado["pistas"]:
         dibujar_texto(pantalla, pista, panel_x + 30, y)
         y += 30
@@ -100,23 +103,23 @@ def dibujar_juego(pantalla, estado):
     # ==========================
     # ZONA CENTRAL
     # ==========================
-    centro_x = ancho // 2 - 180
+    centro_x = ancho // 2 - 200
 
     dibujar_texto(
         pantalla,
         f"Palabra base: {estado['palabra_base'].upper()}",
         centro_x,
-        120,
+        130,
         BLANCO,
         FUENTE_MEDIANA
     )
 
-    pygame.draw.rect(pantalla, BLANCO, (centro_x, 170, 360, 50), 2)
+    pygame.draw.rect(pantalla, BLANCO, (centro_x, 180, 400, 52), 2)
     dibujar_texto(
         pantalla,
         estado["palabra_actual"].upper(),
         centro_x + 15,
-        183,
+        192,
         BLANCO,
         FUENTE_MEDIANA
     )
@@ -125,45 +128,21 @@ def dibujar_juego(pantalla, estado):
     # LETRAS
     # ==========================
     letras = estado["letras"]
-    total_ancho = len(letras) * 55
-    inicio_x = centro_x + 180 - total_ancho // 2
-    y_letras = 260
+    total_ancho = len(letras) * 60
+    inicio_x = centro_x + 200 - total_ancho // 2
+    y_letras = 280
 
     for i, letra in enumerate(letras):
-        x = inicio_x + i * 55
-        pygame.draw.circle(pantalla, AZUL, (x, y_letras), 25)
-        dibujar_texto(pantalla, letra.upper(), x - 8, y_letras - 12)
+        x = inicio_x + i * 60
+        pygame.draw.circle(pantalla, AZUL, (x, y_letras), 26)
+        dibujar_texto(pantalla, letra.upper(), x - 9, y_letras - 13)
 
     # ==========================
-    # OVERLAY + MENSAJE DERROTA
+    # MENSAJE
     # ==========================
-    if estado["estado"] == "perdido":
-
-        overlay = pygame.Surface((ancho, alto), pygame.SRCALPHA)
-        overlay.fill((120, 0, 0, 120))
-        pantalla.blit(overlay, (0, 0))
-
-        panel_rect = pygame.Rect(centro_x - 20, 300, 400, 90)
-        pygame.draw.rect(pantalla, ROJO_OSCURO, panel_rect, border_radius=16)
-        pygame.draw.rect(pantalla, BLANCO, panel_rect, 2, border_radius=16)
-
-        dibujar_texto(
-            pantalla,
-            "💔 TE QUEDASTE SIN VIDAS",
-            panel_rect.x + 40,
-            panel_rect.y + 18,
-            BLANCO,
-            FUENTE_MEDIANA
-        )
-
-        dibujar_texto(
-            pantalla,
-            "GAME OVER",
-            panel_rect.x + 140,
-            panel_rect.y + 55,
-            ROJO,
-            FUENTE
-        )
+    if estado["mensaje"]:
+        color = VERDE if estado["estado"] == "ganado" else ROJO if estado["estado"] == "perdido" else AMARILLO
+        dibujar_texto(pantalla, estado["mensaje"], centro_x, 350, color, FUENTE_MEDIANA)
 
     # ==========================
     # BOTONES DE JUEGO
@@ -172,39 +151,98 @@ def dibujar_juego(pantalla, estado):
         if "botones" not in estado:
             estado["botones"] = crear_botones_juego()
 
-        botones_y = 400
-        botones_x = centro_x
-
+        x_btn = centro_x
         for boton in estado["botones"].values():
-            boton.rect.topleft = (botones_x, botones_y)
+            boton.rect.topleft = (x_btn, 430)
             boton.dibujar(pantalla, FUENTE)
-            botones_x += 140
+            x_btn += 150
 
     # ==========================
-    # FIN DE JUEGO (BOTONES)
+    # FIN DE PARTIDA + RANKING
     # ==========================
     if estado["estado"] in ("ganado", "perdido"):
 
-        # Crear botones de fin si no existen
-        if "botones_fin" not in estado or not isinstance(estado["botones_fin"], dict):
+        overlay = pygame.Surface((ancho, alto), pygame.SRCALPHA)
+        overlay.fill((0, 0, 0, 230))
+        pantalla.blit(overlay, (0, 0))
+
+        # CARD
+        card = pygame.Surface((520, 420), pygame.SRCALPHA)
+        card.fill((15, 30, 50, 230))
+        pantalla.blit(card, (centro_x - 20, 190))
+        pygame.draw.rect(pantalla, AZUL, (centro_x - 20, 190, 520, 420), 2)
+
+        y = 220
+
+        dibujar_texto(pantalla, "RESUMEN DE LA PARTIDA", centro_x, y, AZUL, FUENTE_GRANDE)
+        y += 60
+
+        dibujar_texto(pantalla, f"Nivel máximo alcanzado: {estado['nivel']}", centro_x, y, BLANCO, FUENTE_MEDIANA)
+        y += 40
+        dibujar_texto(pantalla, f"Puntaje final: {estado['puntaje']}", centro_x, y, BLANCO, FUENTE_MEDIANA)
+        y += 40
+        dibujar_texto(
+            pantalla,
+            f"Tiempo restante: {estado['tiempo_restante']} segundos",
+            centro_x,
+            y,
+            BLANCO,
+            FUENTE_MEDIANA
+        )
+
+        # ==========================
+        # 🏆 TOP 3
+        # ==========================
+        usuarios = cargar_usuarios("usuarios.json")
+        ranking = sorted(
+            usuarios.items(),
+            key=lambda item: item[1].get("puntos", 0),
+            reverse=True
+        )
+
+        y += 60
+        dibujar_texto(pantalla, "🏆 TOP 3", centro_x, y, AMARILLO, FUENTE_MEDIANA)
+        y += 40
+
+        for i, (nombre, datos) in enumerate(ranking[:3], start=1):
+            dibujar_texto(
+                pantalla,
+                f"{i}. {nombre} - {datos.get('puntos', 0)} pts",
+                centro_x,
+                y,
+                BLANCO
+            )
+            y += 28
+
+        # ==========================
+        # 📍 PUESTO ACTUAL
+        # ==========================
+        usuario_actual = estado.get("usuario")
+        if usuario_actual:
+            for i, (nombre, _) in enumerate(ranking, start=1):
+                if nombre == usuario_actual:
+                    y += 15
+                    dibujar_texto(
+                        pantalla,
+                        f"📍 Tu puesto actual: #{i}",
+                        centro_x,
+                        y,
+                        VERDE,
+                        FUENTE_MEDIANA
+                    )
+                    break
+
+        # ==========================
+        # BOTONES FINALES
+        # ==========================
+        if "botones_fin" not in estado:
             estado["botones_fin"] = crear_botones_fin_juego()
 
-        # ⚡ Asegurar que las claves existan
-        if "menu" not in estado["botones_fin"]:
-            estado["botones_fin"]["menu"] = Boton(0, 0, 220, 50, "VOLVER AL MENÚ")
-        if "siguiente" not in estado["botones_fin"] and estado["estado"] == "ganado":
-            estado["botones_fin"]["siguiente"] = Boton(0, 0, 220, 50, "SIGUIENTE NIVEL")
-
-        fin_y = 540
-        fin_x = centro_x
-
-        # Dibujar botón "menu"
         boton_menu = estado["botones_fin"]["menu"]
-        boton_menu.rect.topleft = (fin_x, fin_y)
+        boton_menu.rect.topleft = (centro_x + 60, 560)
         boton_menu.dibujar(pantalla, FUENTE)
 
-        # Dibujar botón "siguiente" solo si ganó
         if estado["estado"] == "ganado":
             boton_sig = estado["botones_fin"]["siguiente"]
-            boton_sig.rect.topleft = (fin_x + 240, fin_y)
+            boton_sig.rect.topleft = (centro_x + 260, 560)
             boton_sig.dibujar(pantalla, FUENTE)

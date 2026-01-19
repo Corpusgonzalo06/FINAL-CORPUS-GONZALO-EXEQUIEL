@@ -50,9 +50,7 @@ def guardar_usuarios(usuario_actual: dict, ruta: str) -> None:
         except (FileNotFoundError, json.JSONDecodeError):
             todos_usuarios = {}
 
-
         todos_usuarios.update(usuario_actual)
-
 
         with open(ruta, "w", encoding="utf-8") as archivo:
             json.dump(todos_usuarios, archivo, indent=4, ensure_ascii=False)
@@ -79,13 +77,18 @@ def inicializar_datos_usuario(usuario: dict) -> dict:
         "tiempo_total_juego": 0,
         "partidas_jugadas": 0,
         "victorias": 0,
-        "derrotas": 0
+        "derrotas": 0,
+        "accesibilidad": {
+            "tdah": False
+        }
     }
 
     for clave in datos:
-        usuario[clave] = datos[clave]
+        if clave not in usuario:
+            usuario[clave] = datos[clave]
 
     return usuario
+
 
 def guardar_datos_usuario(usuario: dict, clave_usuario: str | None, ruta: str) -> None:
     """
@@ -123,5 +126,3 @@ def validar_sesion(usuario: dict | None, clave_usuario: str | None) -> bool:
         sesion_valida = False
 
     return sesion_valida
-
-
