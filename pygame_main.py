@@ -1,4 +1,4 @@
-import pygame
+import pygame 
 import sys
 
 from usuarios import cargar_usuarios, guardar_usuarios
@@ -9,7 +9,17 @@ from palabras import PALABRAS
 from pygame_controlador import *
 from pygame_pantalla import dibujar_juego
 
+# ==========================  
+# SONIDOS
 # ==========================
+from pygame_sonidos import (
+    inicializar_sonidos,
+    reproducir_sonido,
+    reproducir_musica_fondo,
+    detener_musica
+)
+
+# ==========================  
 # CONFIGURACIÓN GENERAL
 # ==========================
 pygame.init()
@@ -21,19 +31,25 @@ pygame.display.set_caption("Pop A Word")
 reloj = pygame.time.Clock()
 FUENTE = pygame.font.SysFont("Brodway", 28)
 
+# ==========================  
+# INICIALIZAR SONIDOS
 # ==========================
+sonidos = inicializar_sonidos()
+reproducir_musica_fondo()
+
+# ==========================  
 # CONFIG PARTIDA
 # ==========================
 NIVEL_MAXIMO = 5
 
-# ==========================
+# ==========================  
 # COLORES
 # ==========================
 BLANCO = (255, 255, 255)
 AZUL = (70, 130, 180)
 ROJO = (180, 60, 60)
 
-# ==========================
+# ==========================  
 # FONDO
 # ==========================
 FONDO_MENU = pygame.image.load("fondomenu.jpg")
@@ -49,12 +65,12 @@ def dibujar_texto(texto, x, y, color=BLANCO):
     render = FUENTE.render(texto, True, color)
     pantalla.blit(render, (x, y))
 
-# ==========================
+# ==========================  
 # USUARIOS
 # ==========================
 usuarios = cargar_usuarios("usuarios.json")
 
-# ==========================
+# ==========================  
 # ESTADOS
 # ==========================
 pantalla_actual = "inicio"
@@ -71,7 +87,7 @@ estado_juego = None
 indice_palabra = 0
 lista_bases = list(PALABRAS.keys())
 
-# ==========================
+# ==========================  
 # RECTÁNGULOS
 # ==========================
 rect_usuario = pygame.Rect(650, 250, 300, 40)
@@ -89,13 +105,14 @@ btn_cerrar_sesion = pygame.Rect(700, 480, 200, 55)
 
 btn_atras = pygame.Rect(30, 30, 140, 45)
 
-# ==========================
+# ==========================  
 # LOOP PRINCIPAL
 # ==========================
 while True:
     for evento in pygame.event.get():
         if evento.type == pygame.QUIT:
             guardar_usuarios(usuarios, "usuarios.json")
+            detener_musica()
             pygame.quit()
             sys.exit()
 
@@ -116,11 +133,12 @@ while True:
 
                 elif btn_salir_juego.collidepoint(evento.pos):
                     guardar_usuarios(usuarios, "usuarios.json")
+                    detener_musica()
                     pygame.quit()
                     sys.exit()
 
         # -------- LOGIN / REGISTRO --------
-        elif pantalla_actual in ("login", "registro"):
+        elif pantalla_actual in ["login", "registro"]:
             if evento.type == pygame.MOUSEBUTTONDOWN:
                 if btn_atras.collidepoint(evento.pos):
                     pantalla_actual = "inicio"
@@ -142,17 +160,21 @@ while True:
                             mensaje = ""
                         else:
                             mensaje = "Usuario o contraseña incorrectos"
+                            reproducir_sonido(sonidos, "mal")
                     else:
                         if usuario_input in usuarios:
                             mensaje = "Ese usuario ya existe"
-                        elif not usuario_input or not contrasena_input:
+                            reproducir_sonido(sonidos, "mal")
+                        elif usuario_input == "" or contrasena_input == "":
                             mensaje = "Campos incompletos"
+                            reproducir_sonido(sonidos, "mal")
                         else:
                             usuarios[usuario_input] = {"contraseña": contrasena_input}
                             inicializar_estadisticas(usuarios[usuario_input])
                             guardar_usuarios(usuarios, "usuarios.json")
                             pantalla_actual = "login"
                             mensaje = "Usuario creado ✔"
+                            reproducir_sonido(sonidos, "bien")
 
             elif evento.type == pygame.KEYDOWN:
                 if evento.key == pygame.K_BACKSPACE:
@@ -183,6 +205,8 @@ while True:
                     pantalla_actual = "jugando"
 
                 elif btn_stats.collidepoint(evento.pos):
+                    inicializar_estadisticas(usuario_actual)
+                    guardar_usuarios(usuarios, "usuarios.json")
                     pantalla_actual = mostrar_estadisticas(pantalla, usuario_actual)
 
                 elif btn_cerrar_sesion.collidepoint(evento.pos):
@@ -191,54 +215,79 @@ while True:
                     pantalla_actual = "inicio"
 
         # -------- JUGANDO --------
-        elif pantalla_actual == "jugando" and estado_juego:
+        elif pantalla_actual == "jugando" and estado_juego is not None:
             actualizar_tiempo(estado_juego)
+
+            # >>> CIERRE DE PARTIDA Y GUARDADO DE ESTADÍSTICAS (ÚNICO CAMBIO)
+            if estado_juego["estado"] in ["ganado", "perdido"] and not estado_juego.get("partida_cerrada", False):
+                usuario = usuarios[clave_usuario]
+
+                usuario["partidas_jugadas"] += 1
+                usuario["puntos"] += estado_juego["puntaje_final"]
+
+                completadas = len(estado_juego["palabras_encontradas"])
+                usuario["palabras_completadas"] += completadas
+
+                total = len(estado_juego["palabras_validas"])
+                usuario["palabras_incompletas"] += (total - completadas)
+
+                usuario["errores_totales_juego"] += estado_juego["errores_nivel"]
+
+                tiempo_jugado = estado_juego["tiempo_limite"] - estado_juego["tiempo_restante"]
+                usuario["tiempo_total"] += tiempo_jugado
+
+                guardar_usuarios(usuarios, "usuarios.json")
+                estado_juego["partida_cerrada"] = True
 
             if evento.type == pygame.KEYDOWN:
                 if evento.key == pygame.K_BACKSPACE:
                     borrar_palabra(estado_juego)
                 elif evento.key == pygame.K_RETURN:
                     submit_palabra(estado_juego)
+
+                    if estado_juego["ultimo_feedback"] == "bien":
+                        reproducir_sonido(sonidos, "bien")
+                    elif estado_juego["ultimo_feedback"] == "mal":
+                        reproducir_sonido(sonidos, "mal")
+
                 elif evento.unicode.isalpha():
                     agregar_letra(estado_juego, evento.unicode.lower())
 
             if evento.type == pygame.MOUSEBUTTONDOWN:
-                for boton in estado_juego.get("botones", {}).values():
-                    if boton.fue_clickeado(evento):
-                        if boton.texto == "SHUFFLE":
+                for boton in estado_juego["botones"].values():
+                    if boton["rect"].collidepoint(evento.pos):
+                        if boton["texto"] == "SHUFFLE":
                             mezclar_letras(estado_juego)
-                        elif boton.texto == "CLEAR":
+                        elif boton["texto"] == "CLEAR":
                             borrar_palabra(estado_juego)
-                        elif boton.texto == "SUBMIT":
+                        elif boton["texto"] == "SUBMIT":
                             submit_palabra(estado_juego)
 
-                for nombre, boton in estado_juego.get("botones_comodines", {}).items():
-                    if boton.fue_clickeado(evento):
+                for nombre in estado_juego["botones_comodines"]:
+                    boton = estado_juego["botones_comodines"][nombre]
+                    if boton["rect"].collidepoint(evento.pos):
                         usar_comodin(estado_juego, nombre)
 
-                if estado_juego["estado"] in ("ganado", "perdido"):
-                    for boton in estado_juego.get("botones_fin", {}).values():
-                        if boton.fue_clickeado(evento):
+                if estado_juego["estado"] in ["ganado", "perdido"]:
+                    if "botones_fin" in estado_juego:
+                        for boton in estado_juego["botones_fin"].values():
+                            if boton["rect"].collidepoint(evento.pos):
+                                if estado_juego["estado"] == "ganado" and estado_juego["nivel"] < NIVEL_MAXIMO:
+                                    indice_palabra += 1
+                                    base = lista_bases[indice_palabra]
+                                    estado_juego = crear_estado_desde_palabras(
+                                        base,
+                                        PALABRAS[base],
+                                        nivel=estado_juego["nivel"] + 1,
+                                        puntaje=estado_juego["puntaje"],
+                                        vidas=estado_juego["vidas"]
+                                    )
+                                    estado_juego["usuario"] = clave_usuario
+                                else:
+                                    pantalla_actual = "menu"
+                                    estado_juego = None
 
-                            usuarios[clave_usuario]["puntos"] = estado_juego["puntaje"]
-                            guardar_usuarios(usuarios, "usuarios.json")
-
-                            if estado_juego["estado"] == "ganado" and estado_juego["nivel"] < NIVEL_MAXIMO:
-                                indice_palabra += 1
-                                base = lista_bases[indice_palabra]
-                                estado_juego = crear_estado_desde_palabras(
-                                    base,
-                                    PALABRAS[base],
-                                    nivel=estado_juego["nivel"] + 1,
-                                    puntaje=estado_juego["puntaje"],
-                                    vidas=estado_juego["vidas"]
-                                )
-                                estado_juego["usuario"] = clave_usuario
-                            else:
-                                pantalla_actual = "menu"
-                                estado_juego = None
-
-    # ==========================
+    # ==========================  
     # DIBUJO
     # ==========================
     pantalla.fill((0, 0, 0))
@@ -253,7 +302,7 @@ while True:
         dibujar_texto("REGISTRARSE", btn_registro.x + 25, btn_registro.y + 15)
         dibujar_texto("SALIR", btn_salir_juego.x + 75, btn_salir_juego.y + 15)
 
-    elif pantalla_actual in ("login", "registro"):
+    elif pantalla_actual in ["login", "registro"]:
         titulo = "INICIAR SESIÓN" if pantalla_actual == "login" else "REGISTRO"
 
         pygame.draw.rect(pantalla, BLANCO, rect_usuario, 2)
@@ -273,7 +322,7 @@ while True:
         dibujar_texto(mensaje, 650, 500, ROJO)
 
     elif pantalla_actual == "menu":
-        if clave_usuario:
+        if clave_usuario is not None:
             texto = FUENTE.render(f"👋 Bienvenido, {clave_usuario}", True, BLANCO)
             rect = texto.get_rect(center=(ANCHO // 2, 80))
             pantalla.blit(texto, rect)
@@ -286,7 +335,7 @@ while True:
         dibujar_texto("ESTADÍSTICAS", btn_stats.x + 30, btn_stats.y + 15)
         dibujar_texto("CERRAR SESIÓN", btn_cerrar_sesion.x + 20, btn_cerrar_sesion.y + 15)
 
-    elif pantalla_actual == "jugando" and estado_juego:
+    elif pantalla_actual == "jugando" and estado_juego is not None:
         dibujar_juego(pantalla, estado_juego)
 
     pygame.display.update()

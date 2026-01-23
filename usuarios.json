@@ -1,15 +1,17 @@
 {
     "gonzalo": {
         "contraseña": "corpus",
-        "partidas_jugadas": 7,
+        "partidas_jugadas": 13,
         "palabras_acertadas": 0,
         "palabras_erradas": 0,
         "victorias": 0,
         "derrotas": 7,
-        "puntos": 14,
-        "tiempo_total": 0,
+        "puntos": 82,
+        "tiempo_total": 49,
         "tiempo_total_juego": 0,
-        "errores_totales_juego": 0
+        "errores_totales_juego": 18,
+        "palabras_completadas": 18,
+        "palabras_incompletas": 48
     },
     "santy": {
         "contraseña": "corpu",
@@ -19,6 +21,18 @@
         "victorias": 0,
         "derrotas": 0,
         "puntos": 10,
+        "tiempo_total": 0,
+        "tiempo_total_juego": 0,
+        "errores_totales_juego": 0
+    },
+    "messi": {
+        "contraseña": "lio",
+        "partidas_jugadas": 0,
+        "palabras_acertadas": 0,
+        "palabras_erradas": 0,
+        "victorias": 0,
+        "derrotas": 0,
+        "puntos": 0,
         "tiempo_total": 0,
         "tiempo_total_juego": 0,
         "errores_totales_juego": 0

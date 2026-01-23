@@ -1,4 +1,5 @@
 import pygame
+
 pygame.font.init()
 
 # ==========================
@@ -8,6 +9,9 @@ BLANCO = (255, 255, 255)
 GRIS = (40, 40, 40)
 AZUL = (70, 130, 180)
 
+# ==========================
+# FUENTES
+# ==========================
 FUENTE_TITULO = pygame.font.SysFont("arial", 32)
 FUENTE = pygame.font.SysFont("arial", 22)
 
@@ -17,12 +21,12 @@ FUENTE = pygame.font.SysFont("arial", 22)
 # ==========================
 def inicializar_estadisticas(usuario):
     """
-    Crea las estadísticas del usuario si no existen.
-    Se usa tanto al registrarse como al loguearse.
+    Inicializa las estadísticas del usuario si no existen.
+    Se usa al registrarse o al iniciar sesión.
     """
     usuario.setdefault("partidas_jugadas", 0)
-    usuario.setdefault("victorias", 0)
-    usuario.setdefault("derrotas", 0)
+    usuario.setdefault("palabras_completadas", 0)
+    usuario.setdefault("palabras_incompletas", 0)
     usuario.setdefault("puntos", 0)
     usuario.setdefault("errores_totales_juego", 0)
     usuario.setdefault("tiempo_total", 0)
@@ -32,8 +36,8 @@ def inicializar_estadisticas(usuario):
 # DIBUJAR TEXTO
 # ==========================
 def dibujar_texto(pantalla, texto, x, y, fuente=FUENTE, color=BLANCO):
-    render = fuente.render(texto, True, color)
-    pantalla.blit(render, (x, y))
+    texto_render = fuente.render(texto, True, color)
+    pantalla.blit(texto_render, (x, y))
 
 
 # ==========================
@@ -42,13 +46,15 @@ def dibujar_texto(pantalla, texto, x, y, fuente=FUENTE, color=BLANCO):
 def mostrar_estadisticas(pantalla, usuario_actual):
     """
     Muestra las estadísticas del usuario en pantalla.
-    Retorna 'menu' cuando se presiona el botón volver.
+    Devuelve 'menu' cuando el usuario presiona volver.
     """
-
+    inicializar_estadisticas(usuario_actual)
     reloj = pygame.time.Clock()
     boton_volver = pygame.Rect(300, 420, 200, 45)
 
     corriendo = True
+    resultado = None
+
     while corriendo:
         for evento in pygame.event.get():
             if evento.type == pygame.QUIT:
@@ -57,7 +63,8 @@ def mostrar_estadisticas(pantalla, usuario_actual):
 
             if evento.type == pygame.MOUSEBUTTONDOWN:
                 if boton_volver.collidepoint(evento.pos):
-                    return "menu"
+                    resultado = "menu"
+                    corriendo = False
 
         # -------- DIBUJO --------
         pantalla.fill(GRIS)
@@ -79,14 +86,14 @@ def mostrar_estadisticas(pantalla, usuario_actual):
 
         dibujar_texto(
             pantalla,
-            f"Victorias: {usuario_actual['victorias']}",
+            f"Palabras completadas: {usuario_actual['palabras_completadas']}",
             200,
             140
         )
 
         dibujar_texto(
             pantalla,
-            f"Derrotas: {usuario_actual['derrotas']}",
+            f"Palabras incompletas: {usuario_actual['palabras_incompletas']}",
             200,
             180
         )
@@ -105,10 +112,10 @@ def mostrar_estadisticas(pantalla, usuario_actual):
             260
         )
 
-        tiempo = round(usuario_actual["tiempo_total"], 2)
+        tiempo_total = round(usuario_actual["tiempo_total"], 2)
         dibujar_texto(
             pantalla,
-            f"Tiempo total jugado: {tiempo} segundos",
+            f"Tiempo total jugado: {tiempo_total} segundos",
             200,
             300
         )
@@ -119,3 +126,5 @@ def mostrar_estadisticas(pantalla, usuario_actual):
 
         pygame.display.update()
         reloj.tick(60)
+
+    return resultado
