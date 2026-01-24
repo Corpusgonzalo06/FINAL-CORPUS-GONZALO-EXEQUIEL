@@ -1,6 +1,7 @@
 import pygame
 
 pygame.font.init()
+FONDO_STATS = pygame.image.load("si.jpg")
 
 # ==========================
 # COLORES
@@ -17,22 +18,6 @@ FUENTE = pygame.font.SysFont("arial", 22)
 
 
 # ==========================
-# INICIALIZAR ESTADÍSTICAS
-# ==========================
-def inicializar_estadisticas(usuario):
-    """
-    Inicializa las estadísticas del usuario si no existen.
-    Se usa al registrarse o al iniciar sesión.
-    """
-    usuario.setdefault("partidas_jugadas", 0)
-    usuario.setdefault("palabras_completadas", 0)
-    usuario.setdefault("palabras_incompletas", 0)
-    usuario.setdefault("puntos", 0)
-    usuario.setdefault("errores_totales_juego", 0)
-    usuario.setdefault("tiempo_total", 0)
-
-
-# ==========================
 # DIBUJAR TEXTO
 # ==========================
 def dibujar_texto(pantalla, texto, x, y, fuente=FUENTE, color=BLANCO):
@@ -44,13 +29,13 @@ def dibujar_texto(pantalla, texto, x, y, fuente=FUENTE, color=BLANCO):
 # MOSTRAR ESTADÍSTICAS
 # ==========================
 def mostrar_estadisticas(pantalla, usuario_actual):
-    """
+    """ 
     Muestra las estadísticas del usuario en pantalla.
     Devuelve 'menu' cuando el usuario presiona volver.
     """
-    inicializar_estadisticas(usuario_actual)
+
     reloj = pygame.time.Clock()
-    boton_volver = pygame.Rect(300, 420, 200, 45)
+    boton_volver = pygame.Rect(720, 520, 200, 50)
 
     corriendo = True
     resultado = None
@@ -67,62 +52,68 @@ def mostrar_estadisticas(pantalla, usuario_actual):
                     corriendo = False
 
         # -------- DIBUJO --------
-        pantalla.fill(GRIS)
+        fondo = pygame.transform.scale(FONDO_STATS, pantalla.get_size())
+        pantalla.blit(fondo, (0, 0))
+        overlay = pygame.Surface(pantalla.get_size(), pygame.SRCALPHA)
+        overlay.fill((0, 0, 0, 190))
+        pantalla.blit(overlay, (0, 0))
+
 
         dibujar_texto(
             pantalla,
             "ESTADÍSTICAS DEL JUGADOR",
-            180,
-            30,
+            740,
+            60,
             FUENTE_TITULO
         )
 
         dibujar_texto(
             pantalla,
             f"Partidas jugadas: {usuario_actual['partidas_jugadas']}",
-            200,
-            100
-        )
-
-        dibujar_texto(
-            pantalla,
-            f"Palabras completadas: {usuario_actual['palabras_completadas']}",
-            200,
-            140
-        )
-
-        dibujar_texto(
-            pantalla,
-            f"Palabras incompletas: {usuario_actual['palabras_incompletas']}",
-            200,
+            740,
             180
         )
 
         dibujar_texto(
             pantalla,
-            f"Puntos totales: {usuario_actual['puntos']}",
-            200,
+            f"Palabras completadas: {usuario_actual['palabras_completadas']}",
+            740,
             220
         )
 
         dibujar_texto(
             pantalla,
-            f"Errores totales: {usuario_actual['errores_totales_juego']}",
-            200,
+            f"Palabras incompletas: {usuario_actual['palabras_incompletas']}",
+            740,
             260
+        )
+
+        dibujar_texto(
+            pantalla,
+            f"Puntos totales: {usuario_actual['puntos']}",
+            740,
+            300
+        )
+
+        dibujar_texto(
+            pantalla,
+            f"Errores totales: {usuario_actual['errores_totales_juego']}",
+            740,
+            340
         )
 
         tiempo_total = round(usuario_actual["tiempo_total"], 2)
         dibujar_texto(
             pantalla,
             f"Tiempo total jugado: {tiempo_total} segundos",
-            200,
-            300
+            740,
+            380
         )
 
         # -------- BOTÓN VOLVER --------
         pygame.draw.rect(pantalla, AZUL, boton_volver)
-        dibujar_texto(pantalla, "VOLVER", 360, 432)
+        dibujar_texto(pantalla, "VOLVER", 785, 535)
+
 
         pygame.display.update()
         reloj.tick(60)

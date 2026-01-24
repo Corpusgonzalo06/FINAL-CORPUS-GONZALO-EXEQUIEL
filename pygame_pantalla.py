@@ -93,14 +93,7 @@ def dibujar_juego(pantalla, estado):
     # ---------- ZONA CENTRAL ----------
     centro_x = ancho // 2 - 200
 
-    dibujar_texto(
-        pantalla,
-        f"Palabra base: {estado['palabra_base'].upper()}",
-        centro_x,
-        130,
-        BLANCO,
-        FUENTE_MEDIANA
-    )
+
 
     pygame.draw.rect(pantalla, BLANCO, (centro_x, 180, 400, 52), 2)
     dibujar_texto(

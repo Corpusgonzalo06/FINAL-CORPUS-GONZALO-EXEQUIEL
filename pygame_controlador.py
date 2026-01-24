@@ -23,7 +23,7 @@ def crear_estado_desde_palabras(palabra_base, lista_palabras, nivel=1, puntaje=0
     while i < len(palabra_base):
         letras = agregar_elemento(letras, palabra_base[i])
         i += 1
-
+    random.shuffle(letras)
     TIEMPO_POR_NIVEL = 180
 
     estado = {

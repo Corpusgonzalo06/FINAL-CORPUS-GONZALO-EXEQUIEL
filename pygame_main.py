@@ -9,6 +9,9 @@ from palabras import PALABRAS
 from pygame_controlador import *
 from pygame_pantalla import dibujar_juego
 
+# >>> NUEVO IMPORT (ALEATORIEDAD)
+from manejo_aleatoriedad import seleccionar_palabras_nivel
+
 # ==========================  
 # SONIDOS
 # ==========================
@@ -192,8 +195,10 @@ while True:
         elif pantalla_actual == "menu":
             if evento.type == pygame.MOUSEBUTTONDOWN:
                 if btn_jugar.collidepoint(evento.pos):
-                    indice_palabra = 0
-                    base = lista_bases[indice_palabra]
+
+                    # >>> PALABRA BASE ALEATORIA
+                    palabra_random = seleccionar_palabras_nivel(lista_bases, 1)
+                    base = palabra_random[0]
 
                     estado_juego = crear_estado_desde_palabras(
                         base,
@@ -205,8 +210,6 @@ while True:
                     pantalla_actual = "jugando"
 
                 elif btn_stats.collidepoint(evento.pos):
-                    inicializar_estadisticas(usuario_actual)
-                    guardar_usuarios(usuarios, "usuarios.json")
                     pantalla_actual = mostrar_estadisticas(pantalla, usuario_actual)
 
                 elif btn_cerrar_sesion.collidepoint(evento.pos):
@@ -218,7 +221,6 @@ while True:
         elif pantalla_actual == "jugando" and estado_juego is not None:
             actualizar_tiempo(estado_juego)
 
-            # >>> CIERRE DE PARTIDA Y GUARDADO DE ESTADÍSTICAS (ÚNICO CAMBIO)
             if estado_juego["estado"] in ["ganado", "perdido"] and not estado_juego.get("partida_cerrada", False):
                 usuario = usuarios[clave_usuario]
 
@@ -272,20 +274,8 @@ while True:
                     if "botones_fin" in estado_juego:
                         for boton in estado_juego["botones_fin"].values():
                             if boton["rect"].collidepoint(evento.pos):
-                                if estado_juego["estado"] == "ganado" and estado_juego["nivel"] < NIVEL_MAXIMO:
-                                    indice_palabra += 1
-                                    base = lista_bases[indice_palabra]
-                                    estado_juego = crear_estado_desde_palabras(
-                                        base,
-                                        PALABRAS[base],
-                                        nivel=estado_juego["nivel"] + 1,
-                                        puntaje=estado_juego["puntaje"],
-                                        vidas=estado_juego["vidas"]
-                                    )
-                                    estado_juego["usuario"] = clave_usuario
-                                else:
-                                    pantalla_actual = "menu"
-                                    estado_juego = None
+                                pantalla_actual = "menu"
+                                estado_juego = None
 
     # ==========================  
     # DIBUJO
