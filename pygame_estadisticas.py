@@ -1,7 +1,7 @@
 import pygame
 
 pygame.font.init()
-FONDO_STATS = pygame.image.load("si.jpg")
+FONDO_STATS = pygame.image.load("fondo_juego.jpg")
 
 # ==========================
 # COLORES

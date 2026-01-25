@@ -31,7 +31,7 @@ FUENTE_NIVEL = pygame.font.SysFont("arial", 30, bold=True)
 # ==========================
 # FONDO
 # ==========================
-FONDO_IMG = pygame.image.load("x2.jpg")
+FONDO_IMG = pygame.image.load("fondo_juego.jpg")
 
 # ==========================
 # AUXILIAR
@@ -55,7 +55,7 @@ def dibujar_juego(pantalla, estado):
     # ---------- HEADER ----------
     pygame.draw.rect(pantalla, NEGRO, (0, 0, ancho, 100))
 
-    dibujar_texto(pantalla, "POP A WORD", ancho // 2 - 140, 15, BLANCO, FUENTE_GRANDE)
+    dibujar_texto(pantalla, "MAR DE PALABRAS", ancho // 2 - 140, 15, BLANCO, FUENTE_GRANDE)
     dibujar_texto(pantalla, f"NIVEL {estado['nivel']}", ancho // 2 - 60, 58, AZUL, FUENTE_NIVEL)
 
     dibujar_texto(pantalla, f"Puntaje: {estado['puntaje']}", 30, 20)

@@ -27,9 +27,9 @@ from pygame_sonidos import (
 # ==========================
 pygame.init()
 
-ANCHO, ALTO = 1600, 900
+ANCHO, ALTO = 1700, 650
 pantalla = pygame.display.set_mode((ANCHO, ALTO))
-pygame.display.set_caption("Pop A Word")
+pygame.display.set_caption("Mar de Palabras")
 
 reloj = pygame.time.Clock()
 FUENTE = pygame.font.SysFont("Brodway", 28)
@@ -55,13 +55,13 @@ ROJO = (180, 60, 60)
 # ==========================  
 # FONDO
 # ==========================
-FONDO_MENU = pygame.image.load("fondomenu.jpg")
+FONDO_MENU = pygame.image.load("menu_imagen.jpg")
 
 def dibujar_fondo_menu():
     fondo = pygame.transform.scale(FONDO_MENU, (ANCHO, ALTO))
     pantalla.blit(fondo, (0, 0))
     overlay = pygame.Surface((ANCHO, ALTO), pygame.SRCALPHA)
-    overlay.fill((0, 0, 0, 140))
+    overlay.fill((0, 0, 0, 120))
     pantalla.blit(overlay, (0, 0))
 
 def dibujar_texto(texto, x, y, color=BLANCO):
