@@ -155,7 +155,7 @@ def dibujar_juego(pantalla, estado):
         y += 40
         dibujar_texto(
             pantalla,
-            f"Tiempo restante: {estado['tiempo_restante']} segundos",
+            f"Tiempo jugado: {estado['tiempo_jugado']} segundos",
             centro_x,
             y,
             BLANCO,

@@ -1,105 +1,11 @@
 {
-    "rona": {
-        "contraseña": "dona",
-        "partidas_jugadas": 3,
-        "palabras_acertadas": 0,
-        "palabras_erradas": 0,
-        "victorias": 0,
-        "derrotas": 0,
-        "puntos": 0,
-        "tiempo_total": 4,
-        "tiempo_total_juego": 0,
-        "errores_totales_juego": 9,
-        "palabras_completadas": 0,
-        "palabras_incompletas": 33
-    },
-    "corpus": {
-        "contraseña": "gonzalo",
-        "partidas_jugadas": 1,
-        "palabras_acertadas": 0,
-        "palabras_erradas": 0,
-        "victorias": 0,
-        "derrotas": 0,
-        "puntos": 6,
-        "tiempo_total": 3,
-        "tiempo_total_juego": 0,
-        "errores_totales_juego": 3,
-        "palabras_completadas": 1,
-        "palabras_incompletas": 10
-    },
-    "santy": {
-        "contraseña": "corpus",
-        "partidas_jugadas": 1,
-        "palabras_acertadas": 0,
-        "palabras_erradas": 0,
-        "victorias": 0,
-        "derrotas": 0,
-        "puntos": 18,
-        "tiempo_total": 8,
-        "tiempo_total_juego": 0,
-        "errores_totales_juego": 3,
-        "palabras_completadas": 4,
-        "palabras_incompletas": 7
-    },
-    "mama": {
-        "contraseña": "mama",
-        "partidas_jugadas": 1,
-        "palabras_acertadas": 0,
-        "palabras_erradas": 0,
-        "victorias": 0,
-        "derrotas": 0,
-        "puntos": 0,
-        "tiempo_total": 2,
-        "tiempo_total_juego": 0,
-        "errores_totales_juego": 3,
-        "palabras_completadas": 0,
-        "palabras_incompletas": 11
-    },
-    "mar": {
-        "contraseña": "mar",
-        "partidas_jugadas": 0,
-        "palabras_acertadas": 0,
-        "palabras_erradas": 0,
-        "victorias": 0,
-        "derrotas": 0,
-        "puntos": 0,
-        "tiempo_total": 0,
-        "tiempo_total_juego": 0,
-        "errores_totales_juego": 0
-    },
-    "ana": {
-        "contraseña": "ana",
-        "partidas_jugadas": 1,
-        "palabras_completadas": 0,
-        "palabras_incompletas": 11,
-        "puntos": 0,
-        "errores_totales_juego": 3,
-        "tiempo_total": 1
-    },
     "gonzalo": {
         "contraseña": "corpus",
-        "partidas_jugadas": 26,
-        "palabras_completadas": 6,
-        "palabras_incompletas": 124,
-        "puntos": 48,
-        "errores_totales_juego": 45,
-        "tiempo_total": 421.3352782726288,
-        "palabras_acertadas": 1,
-        "palabras_erradas": 9,
-        "tiempo_total_juego": 28.335278272628784,
-        "victorias": 0,
-        "derrotas": 0,
-        "accesibilidad": {
-            "tdah": false
-        }
-    },
-    "timo": {
-        "contraseña": "timo",
-        "partidas_jugadas": 1,
-        "palabras_completadas": 1,
-        "palabras_incompletas": 10,
-        "puntos": 4,
-        "errores_totales_juego": 3,
-        "tiempo_total": 3
+        "partidas_jugadas": 7,
+        "palabras_completadas": 3,
+        "palabras_incompletas": 51,
+        "puntos": 18,
+        "errores_totales_juego": 21,
+        "tiempo_total": 50
     }
 }

@@ -27,7 +27,7 @@ from pygame_sonidos import (
 # ==========================
 pygame.init()
 
-ANCHO, ALTO = 1700, 650
+ANCHO, ALTO = 1700, 900
 pantalla = pygame.display.set_mode((ANCHO, ALTO))
 pygame.display.set_caption("Mar de Palabras")
 
@@ -93,7 +93,11 @@ lista_bases = list(PALABRAS.keys())
 # ==========================  
 # RECTÁNGULOS
 # ==========================
-rect_usuario = pygame.Rect(650, 250, 300, 40)
+
+btn_tdah = pygame.Rect(700, 560, 200, 55)  # posición debajo de cerrar sesión
+tdah_activo = False  # estado inicial
+
+rect_usuario = pygame.Rect(650, 270, 300, 40)
 rect_contrasena = pygame.Rect(650, 360, 300, 40)
 
 btn_login = pygame.Rect(700, 350, 200, 55)
@@ -193,19 +197,39 @@ while True:
 
         # -------- MENU --------
         elif pantalla_actual == "menu":
-            if evento.type == pygame.MOUSEBUTTONDOWN:
-                if btn_jugar.collidepoint(evento.pos):
 
+            # Dibujar botones del menú
+            pygame.draw.rect(pantalla, AZUL if not tdah_activo else (60, 180, 90), btn_tdah)
+            dibujar_texto("TDAH", btn_tdah.x + 60, btn_tdah.y + 15)
+
+            pygame.draw.rect(pantalla, AZUL, btn_jugar)
+            pygame.draw.rect(pantalla, AZUL, btn_stats)
+            pygame.draw.rect(pantalla, ROJO, btn_cerrar_sesion)
+
+            dibujar_texto("JUGAR", btn_jugar.x + 70, btn_jugar.y + 15)
+            dibujar_texto("ESTADÍSTICAS", btn_stats.x + 30, btn_stats.y + 15)
+            dibujar_texto("CERRAR SESIÓN", btn_cerrar_sesion.x + 20, btn_cerrar_sesion.y + 15)
+
+            # Manejo de clicks
+            if evento.type == pygame.MOUSEBUTTONDOWN:
+                if btn_tdah.collidepoint(evento.pos):
+                    tdah_activo = not tdah_activo  # alterna el estado
+
+                elif btn_jugar.collidepoint(evento.pos):
                     # >>> PALABRA BASE ALEATORIA
                     palabra_random = seleccionar_palabras_nivel(lista_bases, 1)
                     base = palabra_random[0]
+                    
+                    # Pasar accesibilidad al juego
+                    accesibilidad_usuario = usuario_actual.get("accesibilidad", {})
+                    accesibilidad_usuario["tdah"] = tdah_activo
 
                     estado_juego = crear_estado_desde_palabras(
                         base,
                         PALABRAS[base],
-                        nivel=1
+                        nivel=1,
+                        accesibilidad=accesibilidad_usuario
                     )
-
                     estado_juego["usuario"] = clave_usuario
                     pantalla_actual = "jugando"
 
@@ -216,6 +240,7 @@ while True:
                     usuario_actual = None
                     clave_usuario = None
                     pantalla_actual = "inicio"
+
 
         # -------- JUGANDO --------
         elif pantalla_actual == "jugando" and estado_juego is not None:
@@ -300,7 +325,7 @@ while True:
         pygame.draw.rect(pantalla, AZUL, btn_submit)
         pygame.draw.rect(pantalla, AZUL, btn_atras)
 
-        dibujar_texto(titulo, 680, 200)
+        
         dibujar_texto("Usuario:", rect_usuario.x, rect_usuario.y - 30)
         dibujar_texto(usuario_input, rect_usuario.x + 10, rect_usuario.y + 5)
 
@@ -312,10 +337,9 @@ while True:
         dibujar_texto(mensaje, 650, 500, ROJO)
 
     elif pantalla_actual == "menu":
-        if clave_usuario is not None:
-            texto = FUENTE.render(f"👋 Bienvenido, {clave_usuario}", True, BLANCO)
-            rect = texto.get_rect(center=(ANCHO // 2, 80))
-            pantalla.blit(texto, rect)
+        # Dibujar todos los botones del menú, incluyendo TDAH
+        pygame.draw.rect(pantalla, AZUL if not tdah_activo else (60, 180, 90), btn_tdah)
+        dibujar_texto("TDAH", btn_tdah.x + 60, btn_tdah.y + 15)
 
         pygame.draw.rect(pantalla, AZUL, btn_jugar)
         pygame.draw.rect(pantalla, AZUL, btn_stats)
