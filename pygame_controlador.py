@@ -2,10 +2,7 @@ import random
 import time
 
 from comodines import crear_comodines_iniciales
-from mis_funciones import (
-    convertir_a_minusculas,
-    agregar_elemento
-)
+from mis_funciones import (convertir_a_minusculas , agregar_elemento) 
 
 # ==========================
 # CREAR ESTADO INICIAL
@@ -15,17 +12,17 @@ from mis_funciones import (
 # ==========================
 def crear_estado_desde_palabras(palabra_base, lista_palabras, nivel=1, puntaje=0, vidas=3, accesibilidad=None):
     pistas = []
-    i = 0
-    while i < len(lista_palabras):
-        palabra = lista_palabras[i]
+
+    # crear pistas según las palabras válidas
+    for palabra in lista_palabras:
         pistas = agregar_elemento(pistas, "_ " * len(palabra))
-        i += 1
 
     letras = []
-    i = 0
-    while i < len(palabra_base):
-        letras = agregar_elemento(letras, palabra_base[i])
-        i += 1
+
+    # separar letras de la palabra base
+    for letra in palabra_base:
+        letras = agregar_elemento(letras, letra)
+
     random.shuffle(letras)
 
     # ⏱️ TIEMPO por nivel normal
@@ -59,8 +56,8 @@ def crear_estado_desde_palabras(palabra_base, lista_palabras, nivel=1, puntaje=0
         # ⏱️ TIEMPO
         "tiempo_inicio": time.time(),
         "tiempo_limite": TIEMPO_POR_NIVEL,
-        "tiempo_restante": TIEMPO_POR_NIVEL,  # solo lógica
-        "tiempo_jugado": 0,                   # lo que se muestra
+        "tiempo_restante": TIEMPO_POR_NIVEL,
+        "tiempo_jugado": 0,
 
         # comodines
         "comodines": crear_comodines_iniciales(),
@@ -80,6 +77,7 @@ def crear_estado_desde_palabras(palabra_base, lista_palabras, nivel=1, puntaje=0
     }
 
     return estado
+
 
 
 
@@ -139,17 +137,15 @@ def submit_palabra(estado):
     palabra_correcta = False
     palabra_repetida = False
 
-    i = 0
-    while i < len(estado["palabras_validas"]):
-        if palabra == estado["palabras_validas"][i]:
+    # verificar si la palabra es válida
+    for palabra_valida in estado["palabras_validas"]:
+        if palabra == palabra_valida:
             palabra_correcta = True
-        i += 1
 
-    i = 0
-    while i < len(estado["palabras_encontradas"]):
-        if palabra == estado["palabras_encontradas"][i]:
+    # verificar si ya fue encontrada
+    for encontrada in estado["palabras_encontradas"]:
+        if palabra == encontrada:
             palabra_repetida = True
-        i += 1
 
     if palabra_correcta and not palabra_repetida:
         estado["palabras_encontradas"] = agregar_elemento(
@@ -159,31 +155,25 @@ def submit_palabra(estado):
 
         puntos = len(palabra)
         estado["puntaje"] = estado["puntaje"] + puntos
-        estado["mensaje"] = "🔥 +" + str(puntos) + " puntos!"
+        estado["mensaje"] = f"🔥 +{puntos} puntos!"
         estado["ultimo_feedback"] = "bien"
 
-        # 🔹 Feedback extra para TDAH
         if estado.get("tdah", False):
             estado["mensaje"] += " ⚡ ¡Buen trabajo, seguí así!"
 
-        indice = 0
-        while indice < len(estado["palabras_validas"]):
+        # actualizar pista correspondiente
+        for indice in range(len(estado["palabras_validas"])):
             if estado["palabras_validas"][indice] == palabra:
                 letras = ""
-                j = 0
-                while j < len(palabra):
-                    codigo = ord(palabra[j])
-                    letras = letras + chr(codigo - 32) + " "
-                    j += 1
+                for letra in palabra:
+                    letras = letras + chr(ord(letra) - 32) + " "
                 estado["pistas"][indice] = letras
-            indice += 1
 
+        # verificar si el nivel está completo
         nivel_completado = True
-        i = 0
-        while i < len(estado["pistas"]):
-            if "_" in estado["pistas"][i]:
+        for pista in estado["pistas"]:
+            if "_" in pista:
                 nivel_completado = False
-            i += 1
 
         if nivel_completado:
             estado["estado"] = "ganado"
@@ -232,9 +222,7 @@ def submit_palabra(estado):
 # ==========================
 # TIEMPO
 # ==========================
-# ==========================
-# TIEMPO
-# ==========================
+
 def actualizar_tiempo(estado):
     if estado["estado"] == "jugando":
         transcurrido = int(time.time() - estado["tiempo_inicio"])

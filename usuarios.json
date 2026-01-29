@@ -1,11 +1,11 @@
 {
     "gonzalo": {
         "contraseña": "corpus",
-        "partidas_jugadas": 7,
-        "palabras_completadas": 3,
-        "palabras_incompletas": 51,
-        "puntos": 18,
-        "errores_totales_juego": 21,
-        "tiempo_total": 50
+        "partidas_jugadas": 14,
+        "palabras_completadas": 6,
+        "palabras_incompletas": 107,
+        "puntos": 34,
+        "errores_totales_juego": 42,
+        "tiempo_total": 148
     }
 }
