@@ -1,11 +1,23 @@
 {
     "gonzalo": {
         "contraseña": "corpus",
-        "partidas_jugadas": 14,
-        "palabras_completadas": 6,
-        "palabras_incompletas": 107,
-        "puntos": 34,
-        "errores_totales_juego": 42,
-        "tiempo_total": 148
+        "partidas_jugadas": 37,
+        "palabras_completadas": 8,
+        "palabras_incompletas": 309,
+        "puntos": 45,
+        "errores_totales_juego": 111,
+        "tiempo_total": 236,
+        "accesibilidad": {
+            "tdah": false
+        }
+    },
+    "martin": {
+        "contraseña": "ben",
+        "partidas_jugadas": 2,
+        "palabras_completadas": 0,
+        "palabras_incompletas": 14,
+        "puntos": 0,
+        "errores_totales_juego": 6,
+        "tiempo_total": 2
     }
 }

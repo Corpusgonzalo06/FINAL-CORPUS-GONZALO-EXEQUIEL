@@ -54,6 +54,7 @@ def dibujar_fondo(pantalla):
     ancho, alto = pantalla.get_size()
     fondo = pygame.transform.scale(FONDO_IMG, (ancho, alto))
     pantalla.blit(fondo, (0, 0))
+    
 
 
 def dibujar_header(pantalla, estado):
@@ -139,17 +140,18 @@ def dibujar_mensaje(pantalla, estado):
     dibujar_texto(pantalla, estado["mensaje"], centro_x, 350, color, FUENTE_MEDIANA)
 
 
-def dibujar_botones_juego(pantalla, estado):
-    if estado["estado"] != "jugando":
+def dibujar_botones_juego(pantalla, estado_juego):
+    # Solo dibujamos botones cuando el juego está activo o terminó
+    if estado_juego["estado"] not in ("jugando", "ganado", "perdido"):
         return
 
-    if "botones" not in estado:
-        estado["botones"] = crear_botones_juego()
+    if "botones" not in estado_juego:
+        estado_juego["botones"] = crear_botones_juego()
 
     ancho, _ = pantalla.get_size()
     x = ancho // 2 - 200
 
-    for boton in estado["botones"].values():
+    for boton in estado_juego["botones"].values():
         boton["rect"].topleft = (x, 430)
         dibujar_boton(pantalla, boton, FUENTE)
         x += 150
@@ -213,3 +215,5 @@ def dibujar_juego(pantalla, estado):
 
     if estado["estado"] in ("ganado", "perdido"):
         dibujar_fin_partida(pantalla, estado)
+
+

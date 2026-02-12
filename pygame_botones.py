@@ -62,7 +62,7 @@ def dibujar_boton(pantalla, boton, fuente):
 # ==========================
 # CLICK BOTÓN
 # ==========================
-def boton_fue_clickeado(boton, evento):
+def ver_boton_fue_clickeado(boton, evento):
     fue_clic = False
 
     if boton["activo"] == True:
