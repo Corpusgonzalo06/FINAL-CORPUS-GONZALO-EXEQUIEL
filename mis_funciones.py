@@ -1,7 +1,7 @@
 
 import random
 from palabras import *
-
+from usuarios import cargar_usuarios
 def convertir_a_minusculas(palabra: str) -> str:
     """
     Convierte una palabra completa a minúsculas usando códigos ASCII.
@@ -181,3 +181,30 @@ def ver_si_es_numero_valido(texto: str) -> bool:
             valido = False
         i += 1
     return valido
+
+def obtener_top_3():
+    usuarios = cargar_usuarios("usuarios.json")
+
+    lista_usuarios = []
+
+    # Pasar diccionario a lista [nombre, puntos]
+    for nombre in usuarios:
+        puntos = usuarios[nombre]["puntos"]
+        lista_usuarios.append([nombre, puntos])
+
+    # Ordenar manualmente de mayor a menor
+    for i in range(len(lista_usuarios)):
+        for j in range(i + 1, len(lista_usuarios)):
+            if lista_usuarios[j][1] > lista_usuarios[i][1]:
+                aux = lista_usuarios[i]
+                lista_usuarios[i] = lista_usuarios[j]
+                lista_usuarios[j] = aux
+
+    # Tomar los primeros 3
+    top_3 = []
+
+    for i in range(3):
+        if i < len(lista_usuarios):
+            top_3.append(lista_usuarios[i])
+
+    return top_3

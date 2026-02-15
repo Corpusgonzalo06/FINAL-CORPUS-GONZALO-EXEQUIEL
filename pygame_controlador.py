@@ -8,14 +8,7 @@ from comodines import crear_comodines_iniciales
 # ==========================
 # CREAR ESTADO DEL JUEGO
 # ==========================
-def crear_estado_inicial(
-    palabra_base,
-    lista_palabras,
-    nivel=1,
-    puntaje=0,
-    vidas=3,
-    accesibilidad=None
-):
+def crear_estado_inicial(palabra_base, lista_palabras, nivel=1, puntaje=0, vidas=3, accesibilidad=None):
     pistas = []
     for palabra in lista_palabras:
         pistas = agregar_elemento(pistas, "_ " * len(palabra))
