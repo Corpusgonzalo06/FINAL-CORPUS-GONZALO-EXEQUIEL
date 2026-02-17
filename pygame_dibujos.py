@@ -38,6 +38,11 @@ FONDO_IMG = pygame.image.load("fondo_juego.jpg")
 # LAYOUT CENTRAL
 # ==========================
 ZONA_CENTRAL_ANCHO = 400
+def oscurecer_pantalla(pantalla, transparencia=230):
+    ancho, alto = pantalla.get_size()
+    overlay = pygame.Surface((ancho, alto), pygame.SRCALPHA)
+    overlay.fill((0, 0, 0, transparencia))
+    pantalla.blit(overlay, (0, 0))
 
 
 def obtener_centro_x(pantalla):
@@ -126,34 +131,41 @@ def dibujar_zona_central(pantalla, estado):
 
 
 def dibujar_mensaje(pantalla, estado):
-    if not estado["mensaje"]:
-        return
 
-    centro_x = obtener_centro_x(pantalla)
+    if estado["mensaje"]:
 
-    if estado["estado"] == "ganado":
-        color = VERDE
-    elif estado["estado"] == "perdido":
-        color = ROJO
-    else:
-        color = AMARILLO
+        centro_x = obtener_centro_x(pantalla)
 
-    dibujar_texto(pantalla, estado["mensaje"], centro_x, 350, color, FUENTE_MEDIANA)
+        if estado["estado"] == "ganado":
+            color = VERDE
+        elif estado["estado"] == "perdido":
+            color = ROJO
+        else:
+            color = AMARILLO
+
+        dibujar_texto(
+            pantalla,
+            estado["mensaje"],
+            centro_x,
+            350,
+            color,
+            FUENTE_MEDIANA
+        )
 
 
 def dibujar_botones_juego(pantalla, estado_juego):
-    if estado_juego["estado"] not in ("jugando", "ganado", "perdido"):
-        return
 
-    if "botones" not in estado_juego:
-        estado_juego["botones"] = crear_botones_juego()
+    if estado_juego["estado"] in ("jugando", "ganado", "perdido"):
 
-    x = obtener_centro_x(pantalla)
+        if "botones" not in estado_juego:
+            estado_juego["botones"] = crear_botones_juego()
 
-    for boton in estado_juego["botones"].values():
-        boton["rect"].topleft = (x, 430)
-        dibujar_boton(pantalla, boton, FUENTE)
-        x += 150
+        x = obtener_centro_x(pantalla)
+
+        for boton in estado_juego["botones"].values():
+            boton["rect"].topleft = (x, 430)
+            dibujar_boton(pantalla, boton, FUENTE)
+            x += 150
 
 
 
@@ -161,9 +173,9 @@ def dibujar_fin_partida(pantalla, estado):
     ancho, alto = pantalla.get_size()
     centro_x = obtener_centro_x(pantalla)
 
-    overlay = pygame.Surface((ancho, alto), pygame.SRCALPHA)
-    overlay.fill((0, 0, 0, 230))
-    pantalla.blit(overlay, (0, 0))
+    oscurecer_pantalla(pantalla)
+    
+    
 
     pygame.draw.rect(pantalla, AZUL, (centro_x - 20, 190, 520, 420), 2)
 

@@ -1,6 +1,6 @@
 import pygame
 
-def crear_botones():
+def crear_botones_disponibles():
     botones = {}
 
     # --- Botones del menú ---

@@ -1,18 +1,13 @@
 import pygame
+from pygame_dibujos import oscurecer_pantalla
 
 pygame.font.init()
 FONDO_STATS = pygame.image.load("fondo_juego.jpg")
 
-# ==========================
-# COLORES
-# ==========================
 BLANCO = (255, 255, 255)
 GRIS = (40, 40, 40)
 AZUL = (70, 130, 180)
 
-# ==========================
-# FUENTES
-# ==========================
 FUENTE_TITULO = pygame.font.SysFont("arial", 32)
 FUENTE = pygame.font.SysFont("arial", 22)
 
@@ -54,9 +49,7 @@ def mostrar_estadisticas(pantalla, usuario_actual):
         # -------- DIBUJO --------
         fondo = pygame.transform.scale(FONDO_STATS, pantalla.get_size())
         pantalla.blit(fondo, (0, 0))
-        overlay = pygame.Surface(pantalla.get_size(), pygame.SRCALPHA)
-        overlay.fill((0, 0, 0, 190))
-        pantalla.blit(overlay, (0, 0))
+        oscurecer_pantalla(pantalla, 190)
 
 
         dibujar_texto(

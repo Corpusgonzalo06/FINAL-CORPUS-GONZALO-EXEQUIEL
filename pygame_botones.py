@@ -23,41 +23,24 @@ def crear_boton(x=0, y=0, ancho=150, alto=50, texto=""):
 # DIBUJAR BOTÓN
 # ==========================
 def dibujar_boton(pantalla, boton, fuente):
-    mouse_pos = pygame.mouse.get_pos()
-
-    esta_hover = False
-    if boton["rect"].collidepoint(mouse_pos):
-        esta_hover = True
-
-    color = AZUL
-
-    if boton["activo"] == False:
-        color = GRIS_OSCURO
+    if boton["activo"]:
+        color = AZUL
     else:
-        if esta_hover:
-            color = AZUL_HOVER
+        color = GRIS_OSCURO
 
     pygame.draw.rect(
         pantalla,
         color,
-        boton["rect"],
-        border_radius=10
+        boton["rect"]
     )
 
-    pygame.draw.rect(
-        pantalla,
-        BLANCO,
-        boton["rect"],
-        2,
-        border_radius=10
-    )
 
     texto_render = fuente.render(boton["texto"], True, BLANCO)
+    texto_rect = texto_render.get_rect(center=boton["rect"].center)
+    pantalla.blit(texto_render, texto_rect)
 
-    x_texto = boton["rect"].centerx - texto_render.get_width() // 2
-    y_texto = boton["rect"].centery - texto_render.get_height() // 2
 
-    pantalla.blit(texto_render, (x_texto, y_texto))
+
 
 # ==========================
 # CLICK BOTÓN

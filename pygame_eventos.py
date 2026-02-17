@@ -8,13 +8,24 @@ from palabras import PALABRAS
 from manejo_aleatoriedad import seleccionar_palabras_nivel
 from pygame_botones import ver_boton_fue_clickeado
 from pygame_sonidos import reproducir_sonido, detener_musica
-from pygame_controlador import *
-from pygame_botones import *
+
+
+from pygame_controlador import (
+    borrar_palabra,
+    procesar_intento,
+    agregar_letra,
+    mezclar_letras,
+    usar_comodin,
+    actualizar_tiempo
+)
+
+from pygame_estado_juego import crear_estado_inicial
 
 
 
-def crear_estado_app():
-    return {
+
+def iniciar_informacion_juego():
+    estado = {
         "pantalla_actual": "inicio",
         "usuario_input": "",
         "contrasena_input": "",
@@ -25,6 +36,7 @@ def crear_estado_app():
         "estado_juego": None,
         "tdah_activo": False
     }
+    return estado
 
 def salir_del_juego(usuarios):
     guardar_usuarios(usuarios, "usuarios.json")
@@ -68,7 +80,7 @@ def eventos_login_registro(evento, estado, usuarios, sonidos,botones):
         elif botones["rect_contrasena"].collidepoint(evento.pos):
 
             estado["input_activo"] = "contrasena"
-
+ 
         elif botones["btn_submit"].collidepoint(evento.pos):
             usuario_input = estado["usuario_input"]
             contrasena_input = estado["contrasena_input"]
@@ -112,32 +124,40 @@ def eventos_login_registro(evento, estado, usuarios, sonidos,botones):
 
     return estado
 
+def iniciar_partida(estado, lista_bases):
+    palabra_random = seleccionar_palabras_nivel(lista_bases, 1)
+    base = palabra_random[0]
 
+    accesibilidad = estado["usuario_actual"].get("accesibilidad", {})
+    accesibilidad["tdah"] = estado["tdah_activo"]
+
+    estado["usuario_actual"]["accesibilidad"] = accesibilidad
+
+    estado["estado_juego"] = crear_estado_inicial(
+        base,
+        PALABRAS[base],
+        nivel=1,
+        accesibilidad=accesibilidad
+    )
+
+    estado["estado_juego"]["usuario"] = estado["clave_usuario"]
+    estado["pantalla_actual"] = "jugando"
+
+    return estado
 
 def eventos_menu(evento, estado, botones, lista_bases, pantalla):
     if evento.type == pygame.MOUSEBUTTONDOWN:
+
         if botones["btn_tdah"].collidepoint(evento.pos):
             estado["tdah_activo"] = not estado["tdah_activo"]
 
         elif botones["btn_jugar"].collidepoint(evento.pos):
-            palabra_random = seleccionar_palabras_nivel(lista_bases, 1)
-            base = palabra_random[0]
+            estado = iniciar_partida(estado, lista_bases)
 
-            accesibilidad = estado["usuario_actual"].get("accesibilidad", {})
-            accesibilidad["tdah"] = estado["tdah_activo"]
-
-            estado["usuario_actual"]["accesibilidad"] = accesibilidad  # 👈 ESTA LÍNEA NUEVA
-
-            estado["estado_juego"] = crear_estado_inicial(
-                base,
-                PALABRAS[base],
-                nivel=1,
-                accesibilidad=accesibilidad
-            )
-            estado["estado_juego"]["usuario"] = estado["clave_usuario"]
-            estado["pantalla_actual"] = "jugando"
         elif botones["btn_stats"].collidepoint(evento.pos):
-            estado["pantalla_actual"] = mostrar_estadisticas(pantalla, estado["usuario_actual"])
+            estado["pantalla_actual"] = mostrar_estadisticas(
+                pantalla, estado["usuario_actual"]
+            )
 
         elif botones["btn_cerrar_sesion"].collidepoint(evento.pos):
             estado["usuario_actual"] = None
@@ -183,7 +203,7 @@ def eventos_jugando(evento, estado, usuarios, sonidos):
             borrar_palabra(estado_juego)
 
         elif evento.key == pygame.K_RETURN:
-            submit_palabra(estado_juego)
+            procesar_intento(estado_juego)
 
             if estado_juego["ultimo_feedback"] == "bien":
                 reproducir_sonido(sonidos, "bien")
@@ -201,7 +221,7 @@ def eventos_jugando(evento, estado, usuarios, sonidos):
             elif boton["texto"] == "CLEAR":
                 borrar_palabra(estado_juego)
             elif boton["texto"] == "SUBMIT":
-                submit_palabra(estado_juego)
+                procesar_intento(estado_juego)
 
     for nombre, boton in estado_juego["botones_comodines"].items():
         if ver_boton_fue_clickeado(boton, evento):

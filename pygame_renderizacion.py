@@ -1,4 +1,5 @@
 import pygame
+from pygame_dibujos import oscurecer_pantalla
 
 # ==========================
 # COLORES (podés importarlos si los tenés en otro módulo)
@@ -11,9 +12,7 @@ def mostrar_fondo_menu(pantalla, fondo_menu, ancho, alto):
     fondo = pygame.transform.scale(fondo_menu, (ancho, alto))
     pantalla.blit(fondo, (0, 0))
 
-    overlay = pygame.Surface((ancho, alto), pygame.SRCALPHA)
-    overlay.fill((0, 0, 0, 120))
-    pantalla.blit(overlay, (0, 0))
+    oscurecer_pantalla(pantalla, 120)
 
 
 def mostrar_texto_en_la_interfaz(pantalla, fuente, texto, x, y, color=BLANCO):
@@ -49,7 +48,11 @@ def mostrar_login_registro(pantalla, fuente, estado, botones):
 
 
 def mostrar_menu(pantalla, fuente, estado, botones):
-    color_tdah = (60, 180, 90) if estado["tdah_activo"] else AZUL
+    if estado["tdah_activo"]:
+        color_tdah = (60, 180, 90)
+    else:
+        color_tdah = AZUL
+
 
     pygame.draw.rect(pantalla, color_tdah, botones["btn_tdah"])
     mostrar_texto_en_la_interfaz(pantalla, fuente, "MODO-TDAH", botones["btn_tdah"].x + 60, botones["btn_tdah"].y + 15)
@@ -64,7 +67,7 @@ def mostrar_menu(pantalla, fuente, estado, botones):
 
 
 def mostrar_vista_actual(pantalla, fuente, fondo_menu, ancho, alto, estado, botones, dibujar_juego):
-    pantalla.fill((0, 0, 0))
+
     mostrar_fondo_menu(pantalla, fondo_menu, ancho, alto)
 
     if estado["pantalla_actual"] == "inicio":

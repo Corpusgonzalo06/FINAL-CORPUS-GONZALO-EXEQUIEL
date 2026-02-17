@@ -21,7 +21,7 @@ def limpiar_palabra(palabra: str) -> str:
     palabra_limpia = convertir_a_minusculas(palabra_limpia)
     return palabra_limpia
 
-def es_palabra_permitida(palabra: str, lista_permitida: list) -> bool:
+def verificar_si_palabra_es_permitida(palabra: str, lista_permitida: list) -> bool:
     """
     Verifica si la palabra existe dentro de la lista de palabras permitidas.
 
@@ -33,15 +33,15 @@ def es_palabra_permitida(palabra: str, lista_permitida: list) -> bool:
         bool: True si la palabra está permitida, False si no.
     """
     encontrada = False
-    i = 0
-    while i < len(lista_permitida):
-        if lista_permitida[i] == palabra:
+
+    for palabra_valida in lista_permitida:
+        if palabra_valida == palabra:
             encontrada = True
             break
-        i += 1
+
     return encontrada
 
-def fue_palabra_usada(palabra: str, lista_usadas: list) -> bool:
+def verificar_palabra_usada(palabra: str, lista_usadas: list) -> bool:
     """
     Verifica si la palabra ya fue usada previamente.
 
@@ -53,13 +53,14 @@ def fue_palabra_usada(palabra: str, lista_usadas: list) -> bool:
         bool: True si la palabra ya fue usada, False si no.
     """
     usada = False
-    i = 0
-    while i < len(lista_usadas):
-        if lista_usadas[i] == palabra:
+
+    for palabra_usada in lista_usadas:
+        if palabra_usada == palabra:
             usada = True
             break
-        i += 1
+
     return usada
+
 
 
 def validar_palabra(palabra: str, lista_permitida: list, lista_usadas: list) -> bool:
@@ -80,7 +81,7 @@ def validar_palabra(palabra: str, lista_permitida: list, lista_usadas: list) -> 
     palabra_limpia = limpiar_palabra(palabra)
 
     if palabra_limpia != "":
-        if es_palabra_permitida(palabra_limpia, lista_permitida) and not fue_palabra_usada(palabra_limpia, lista_usadas):
+        if verificar_si_palabra_es_permitida(palabra_limpia, lista_permitida) and not verificar_palabra_usada(palabra_limpia, lista_usadas):
             es_valida = True
 
     return es_valida
