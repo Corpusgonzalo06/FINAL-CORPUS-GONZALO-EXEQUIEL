@@ -8,7 +8,7 @@
         "errores_totales_juego": 156,
         "tiempo_total": 421,
         "accesibilidad": {
-            "tdah": false
+            "tdah": true
         }
     },
     "martin": {

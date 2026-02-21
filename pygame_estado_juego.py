@@ -29,10 +29,13 @@ def configurar_accesibilidad(estado, accesibilidad):
     estado["tdah"] = False
     estado["mensaje_inicial"] = ""
 
-    if accesibilidad and accesibilidad.get("tdah"):
-        estado["tdah"] = True
-        estado["tiempo_por_nivel"] = 90
-        estado["mensaje_inicial"] = "⚡ Modo rápido activado"
+    # SIN .get()
+    if accesibilidad is not None:
+        if "tdah" in accesibilidad:
+            if accesibilidad["tdah"] == True:
+                estado["tdah"] = True
+                estado["tiempo_por_nivel"] = 90
+                estado["mensaje_inicial"] = "⚡ Modo rápido activado"
 
 
 # ==========================
