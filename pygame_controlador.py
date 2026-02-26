@@ -1,7 +1,7 @@
 import random
 import time
-from mis_funciones import convertir_a_minusculas, agregar_elemento
-from validaciones import limpiar_palabra, verificar_si_palabra_es_permitida ,verificar_palabra_usada
+from manejo_mis_funciones import convertir_a_minusculas, agregar_elemento
+from manejo_validaciones import limpiar_palabra, verificar_si_palabra_es_permitida ,verificar_palabra_usada
 
 
 def ver_si_esta_jugando(estado):

@@ -1,7 +1,7 @@
 
 import random
 from palabras import *
-from usuarios import cargar_usuarios
+from usuarios_datos import cargar_usuarios
 def convertir_a_minusculas(palabra: str) -> str:
     """
     Convierte una palabra completa a minúsculas usando códigos ASCII.

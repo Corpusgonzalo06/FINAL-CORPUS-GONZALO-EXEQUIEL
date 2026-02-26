@@ -2,7 +2,7 @@ import pygame
 import sys
 
 from estadisticas import inicializar_estadisticas
-from usuarios import guardar_usuarios
+from usuarios_datos import guardar_usuarios
 from pygame_estadisticas import mostrar_estadisticas
 from palabras import PALABRAS
 from manejo_aleatoriedad import seleccionar_palabras_nivel

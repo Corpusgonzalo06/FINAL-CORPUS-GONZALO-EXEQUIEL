@@ -1,4 +1,4 @@
-from mis_funciones import *
+from manejo_mis_funciones import *
 
 def revelar_palabra_base(palabra_base: str) -> None:
     """

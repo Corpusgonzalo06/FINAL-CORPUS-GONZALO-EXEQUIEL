@@ -1,7 +1,7 @@
 import random
 import time
-from mis_funciones import agregar_elemento
-from comodines import crear_comodines_iniciales
+from manejo_mis_funciones import agregar_elemento
+from consola_comodines import crear_comodines_iniciales
 
 
 # ==========================

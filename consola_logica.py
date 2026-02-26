@@ -1,11 +1,11 @@
 import random
 import time
-from mis_funciones import agregar_elemento, convertir_a_minusculas, desordenar_letras
-import comodines
-from usuarios import cargar_usuarios, guardar_usuarios, inicializar_datos_usuario, guardar_datos_usuario, validar_sesion
+from manejo_mis_funciones import agregar_elemento, convertir_a_minusculas, desordenar_letras
+import consola_comodines
+from usuarios_datos import cargar_usuarios, guardar_usuarios, inicializar_datos_usuario, guardar_datos_usuario, validar_sesion
 from palabras import PALABRAS
-from funciones_auxiliares import mostrar_letras, mostrar_encabezado_de_juego, mostrar_encabezado_de_nivel
-from validaciones import validar_palabra
+from manejo_auxiliares import mostrar_letras, mostrar_encabezado_de_juego, mostrar_encabezado_de_nivel
+from manejo_validaciones import validar_palabra
 from manejo_puntaje import *
 from manejo_aleatoriedad import seleccionar_palabras_nivel, preparar_palabra
 from customizacion_nivel import mostrar_parcialmente_palabra
@@ -80,7 +80,7 @@ def inicializar_juego(usuario: dict, vidas: int = 3) -> dict:
         "nivel": 1,
         "vidas": vidas,
         "reinicios": 3,
-        "comodines_jugador": comodines.crear_comodines_iniciales(True)
+        "comodines_jugador": consola_comodines.crear_comodines_iniciales(True)
     }
     return estado_juego
 
@@ -101,7 +101,7 @@ def aplicar_comodines(estado_juego: dict, palabra_base: str, lista_palabras: lis
         None: No retorna un valor directo porque solo modifica la cantidad de vidas
         dentro del estado del juego.
     """
-    estado_juego["vidas"] = comodines.manejar_comodines(
+    estado_juego["vidas"] = consola_comodines.manejar_comodines(
         estado_juego["comodines_jugador"],
         palabra_base,
         lista_palabras,
@@ -173,11 +173,11 @@ def mostrar_avance_del_turno(intento: str, palabras_usadas: list, lista_palabras
     print(f"✅ ¡Correcto! +{puntos} puntos | "f"Progreso: {cantidad_acertadas}/{cantidad_totales} | "f"Vidas: {estado_juego['vidas']}")
     print("---------------------------------------------------")
 
-def procesar_acierto(intento: str, palabras_usadas: list, lista_palabras: list, estado_juego: dict, usuario: dict, racha: int, momento_del_intento: float) -> dict:
+def procesar_acierto(intento: str, palabras_usadas: list, lista_palabras: list, estado_juego: dict, usuario: dict,  momento_del_intento: float) -> dict:
     """
     Descripción:
         Procesa un acierto del jugador. Agrega la palabra usada, calcula los puntos
-        obtenidos, actualiza el puntaje total, muestra el avance del turno y aumenta la racha.
+        obtenidos, actualiza el puntaje total, muestra el avance del turno.
 
     Parámetros:
         intento (str): La palabra ingresada correctamente por el jugador.
@@ -185,56 +185,46 @@ def procesar_acierto(intento: str, palabras_usadas: list, lista_palabras: list, 
         lista_palabras (list): Lista completa de palabras requeridas para el nivel.
         estado_juego (dict): Estado actual del juego (vidas, nivel, puntaje, etc.).
         usuario (dict): Datos del usuario, donde se actualiza el puntaje total.
-        racha (int): Número actual de aciertos consecutivos del jugador.
         momento_del_intento (float): Momento exacto del intento, usado para el cálculo de puntos.
 
     Retorno:
-        dict: Devuelve un diccionario con la racha actualizada y la lista de palabras usadas.
+        dict:  la lista de palabras usadas.
     """
     palabras_usadas = actualizar_palabras_usadas(palabras_usadas, intento)
-    puntos = calcular_puntos_turno(intento, racha, momento_del_intento)
+    puntos = calcular_puntos_turno(intento, momento_del_intento)
 
     aplicar_puntos(usuario, estado_juego, puntos)
     mostrar_avance_del_turno(intento, palabras_usadas, lista_palabras, estado_juego, puntos)
 
-    racha = actualizar_racha(racha)
-
-    resultado = {
-        "racha": racha,
-        "palabras_usadas": palabras_usadas
-    }
-    return resultado
+    return palabras_usadas
 
 
-def procesar_error(estado_juego: dict, usuario: dict) -> int:
+def procesar_error(estado_juego: dict, usuario: dict) -> None:
     """
     Descripción:
-        Procesa un error del jugador. Resta una vida, reinicia la racha a cero
+        Procesa un error del jugador. Resta una vida
         y registra el error en los datos del usuario.
 
     Parámetros:
         estado_juego (dict): Contiene el estado actual del juego, incluyendo las vidas del jugador.
         usuario (dict): Información del usuario donde se suma un error cometido.
 
-    Retorno:
-        int: Devuelve la racha reiniciada en 0, ya que un error corta cualquier racha activa.
     """
     estado_juego["vidas"] -= 1
-    racha = 0
+
 
     sumar_error(usuario)
     print(f"❌ Incorrecto! Vidas restantes: {estado_juego['vidas']}")
 
-    return racha
 
 
-def procesar_intento(intento: str, palabras_usadas: list, lista_palabras: list, estado_juego: dict, usuario: dict, racha: int, momento_del_intento: float) -> dict:
+def procesar_intento(intento: str, palabras_usadas: list, lista_palabras: list, estado_juego: dict, usuario: dict, momento_del_intento: float) -> list:
     """
     Descripción:
         Determina si el intento del jugador es correcto o incorrecto.
         Si acierta, procesa el acierto y actualiza puntos, racha y palabras usadas.
-        Si se equivoca, procesa el error y reinicia la racha.
-        Devuelve siempre el estado actualizado de racha y palabras usadas.
+        Si se equivoca, procesa el error.
+        Devuelve palabras usadas.
 
     Parámetros:
         intento (str): La palabra ingresada por el jugador.
@@ -242,29 +232,23 @@ def procesar_intento(intento: str, palabras_usadas: list, lista_palabras: list, 
         lista_palabras (list): Lista completa de palabras válidas del nivel.
         estado_juego (dict): Estado actual del juego (vidas, nivel, puntaje, etc.).
         usuario (dict): Datos del usuario donde se registran puntos y errores.
-        racha (int): Racha de aciertos consecutivos antes del intento actual.
+       
         momento_del_intento (float): Momento exacto del intento, usado para calcular puntos.
 
-    Retorno:
-        dict: Devuelve un diccionario con la racha actualizada y la lista de palabras usadas,
-        dependiendo de si el intento fue correcto o no.
+
     """
-    resultado = {
-        "racha": racha,
-        "palabras_usadas": palabras_usadas
-    }
+    resultado = palabras_usadas
 
     if validar_palabra(intento, lista_palabras, palabras_usadas):
         resultado = procesar_acierto(
             intento, palabras_usadas, lista_palabras,
-            estado_juego, usuario, racha, momento_del_intento
+            estado_juego, usuario, momento_del_intento
         )
     else:
-        nueva_racha = procesar_error(estado_juego, usuario)
-        resultado["racha"] = nueva_racha
+        procesar_error(estado_juego, usuario)
 
+    
     return resultado
-
 
 
 def ejecutar_ronda(palabra_base: str, lista_palabras: list, estado_juego: dict, usuario: dict) -> list:
@@ -284,7 +268,7 @@ def ejecutar_ronda(palabra_base: str, lista_palabras: list, estado_juego: dict, 
         list: Devuelve la lista de palabras acertadas durante toda la ronda.
     """
     palabras_usadas = []
-    racha = 0
+
 
     mostrar_parcialmente_palabra(palabra_base, lista_palabras)
     while estado_juego["vidas"] > 0 and len(palabras_usadas) < len(lista_palabras):
@@ -296,10 +280,10 @@ def ejecutar_ronda(palabra_base: str, lista_palabras: list, estado_juego: dict, 
 
         resultado = procesar_intento(
             intento, palabras_usadas, lista_palabras,
-            estado_juego, usuario, racha, momento_del_intento
+            estado_juego, usuario, momento_del_intento
         )
 
-        racha = resultado["racha"]
+
         palabras_usadas = resultado["palabras_usadas"]
 
     return palabras_usadas

@@ -1,7 +1,7 @@
 import pygame
 from pygame_botones import crear_botones_juego, crear_botones_comodines, crear_botones_fin_juego, dibujar_boton
-from usuarios import cargar_usuarios
-from mis_funciones import obtener_top_3
+from usuarios_datos import cargar_usuarios
+from manejo_mis_funciones import obtener_top_3
 # ==========================
 # COLORES
 # ==========================
@@ -32,7 +32,7 @@ FUENTE_NIVEL = pygame.font.SysFont("arial", 30, bold=True)
 # ==========================
 # FONDO
 # ==========================
-FONDO_IMG = pygame.image.load("fondo_juego.jpg")
+FONDO_IMG = pygame.image.load("imagen_fondo.jpg")
 
 # ==========================
 # LAYOUT CENTRAL

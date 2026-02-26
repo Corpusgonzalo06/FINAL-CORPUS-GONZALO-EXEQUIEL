@@ -1,6 +1,6 @@
-from logica_juego import logica_principal
-from usuarios import cargar_usuarios
-from login import iniciar_sesion, registrar_usuario
+from consola_logica import logica_principal
+from usuarios_datos import cargar_usuarios
+from usuarios_gestor import iniciar_sesion, registrar_usuario
 
 RUTA = "usuarios.json"
 

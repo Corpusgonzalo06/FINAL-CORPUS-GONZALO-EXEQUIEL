@@ -1,6 +1,6 @@
 import pygame
 import sys
-from usuarios import cargar_usuarios, guardar_usuarios
+from usuarios_datos import cargar_usuarios, guardar_usuarios
 from estadisticas import inicializar_estadisticas
 from pygame_estadisticas import mostrar_estadisticas
 from palabras import PALABRAS
@@ -34,7 +34,7 @@ BLANCO = (255, 255, 255)
 AZUL = (70, 130, 180)
 ROJO = (180, 60, 60)
 
-FONDO_MENU = pygame.image.load("menu_imagen.jpg")
+FONDO_MENU = pygame.image.load("imagen_menu.jpg")
 botones = crear_botones_disponibles()
 
 usuarios = cargar_usuarios("usuarios.json")

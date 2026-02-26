@@ -1,5 +1,5 @@
 from random import randint
-from mis_funciones import agregar_elemento
+from manejo_mis_funciones import agregar_elemento
 
 def sortear_posicion(largo_palabra: int) -> int:
     """

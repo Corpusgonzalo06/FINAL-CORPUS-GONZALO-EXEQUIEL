@@ -8,8 +8,8 @@ def inicializar_sonidos():
 
     sonidos = {}
 
-    sonidos["bien"] = pygame.mixer.Sound("bell-notification-337658.mp3")
-    sonidos["mal"] = pygame.mixer.Sound("notification-power-432434.mp3")
+    sonidos["bien"] = pygame.mixer.Sound("audio_bien.mp3")
+    sonidos["mal"] = pygame.mixer.Sound("audio_mal.mp3")
 
     sonidos["bien"].set_volume(0.4)
     sonidos["mal"].set_volume(0.4)

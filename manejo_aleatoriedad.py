@@ -1,6 +1,6 @@
 import random
-from mis_funciones import agregar_elemento , desordenar_letras
-from funciones_auxiliares import mostrar_letras
+from manejo_mis_funciones import agregar_elemento , desordenar_letras
+from manejo_auxiliares import mostrar_letras
 from palabras import PALABRAS
 
 def seleccionar_palabras_nivel(todas_las_palabras: list, cantidad: int = 3) -> list:

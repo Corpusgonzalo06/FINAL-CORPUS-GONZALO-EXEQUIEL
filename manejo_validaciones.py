@@ -1,4 +1,4 @@
-from mis_funciones import crear_mi_separador, convertir_a_minusculas, agregar_elemento
+from manejo_mis_funciones import crear_mi_separador, convertir_a_minusculas, agregar_elemento
 
 def limpiar_palabra(palabra: str) -> str:
     """

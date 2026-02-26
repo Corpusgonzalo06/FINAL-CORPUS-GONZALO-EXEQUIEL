@@ -1,6 +1,6 @@
-from usuarios import guardar_usuarios
+from usuarios_datos import guardar_usuarios
 from estadisticas import inicializar_estadisticas
-from mis_funciones import limpiar_texto
+from manejo_mis_funciones import limpiar_texto
 
 
 def buscar_usuario(usuarios: dict, nombre: str) -> bool:

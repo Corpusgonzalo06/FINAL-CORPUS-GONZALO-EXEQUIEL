@@ -53,21 +53,18 @@ def sumar_error(usuario: dict) -> None:
 
 
 
-def calcular_puntos_turno(intento: str, racha: int, tiempo_respuesta: float) -> int:
+def calcular_puntos_turno(intento: str, tiempo_respuesta: float) -> int:
     """
     Calcula los puntos de un turno, sumando bonus por racha.
 
     PARÁMETROS:
         intento (str): Palabra ingresada por el jugador.
-        racha (int): Racha actual de aciertos.
         tiempo_respuesta (float): Tiempo que tardó el jugador en responder.
 
     RETORNO:
         int: Puntos obtenidos en el turno.
     """
     puntos = calcular_puntos_por_palabra(intento, tiempo_respuesta)
-    if racha >= 2:
-        puntos += 2
     return puntos
 
 
@@ -90,20 +87,5 @@ def aplicar_puntos(usuario: dict, estado_juego: dict, puntos: int) -> None:
     estado_juego["puntaje"] += puntos
     sumar_puntos_por_acierto(usuario, puntos)
 
-
-
-def actualizar_racha(racha: int) -> int:
-    """
-    Descripción:
-        Aumenta en 1 la racha actual de aciertos.
-
-    Parámetros:
-        racha (int): Número actual de aciertos consecutivos.
-
-    Retorno:
-        int: Devuelve la racha actualizada después del acierto.
-    """
-    racha = racha + 1
-    return racha
 
 

@@ -1,7 +1,7 @@
 import random
-from mis_funciones import agregar_elemento
+from manejo_mis_funciones import agregar_elemento
 from manejo_aleatoriedad import mezclar_palabras
-from validaciones import validar_fila
+from manejo_validaciones import validar_fila
 
 def leer_archivo(ruta_archivo: str) -> list:
     """

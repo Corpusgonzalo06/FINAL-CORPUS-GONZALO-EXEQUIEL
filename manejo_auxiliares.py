@@ -1,5 +1,5 @@
 from palabras import PALABRAS
-from mis_funciones import agregar_elemento
+from manejo_mis_funciones import agregar_elemento
 import random 
 
 def mostrar_encabezado_de_juego() -> None:
