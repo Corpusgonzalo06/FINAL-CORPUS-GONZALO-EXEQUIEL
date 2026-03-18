@@ -99,9 +99,9 @@ def iniciar_sesion(usuarios: dict) -> tuple:
     usuario_logeado = None  
     clave_usuario = None
 
-    no_existe = buscar_usuario(usuarios, nombre)  
+    existe = buscar_usuario(usuarios, nombre)  
 
-    if (not no_existe) or (nombre == ""):
+    if (not existe) or (nombre == ""):
         print("❌ Usuario no encontrado.")
 
     else:

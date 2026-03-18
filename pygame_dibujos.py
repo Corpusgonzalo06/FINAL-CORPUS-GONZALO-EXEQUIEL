@@ -38,7 +38,7 @@ FONDO_IMG = pygame.image.load("imagen_fondo.jpg")
 # LAYOUT CENTRAL
 # ==========================
 ZONA_CENTRAL_ANCHO = 400
-def oscurecer_pantalla(pantalla, transparencia=230):
+def oscurecer_pantalla(pantalla, transparencia = 230):
     ancho, alto = pantalla.get_size()
     overlay = pygame.Surface((ancho, alto), pygame.SRCALPHA)
     overlay.fill((0, 0, 0, transparencia))
