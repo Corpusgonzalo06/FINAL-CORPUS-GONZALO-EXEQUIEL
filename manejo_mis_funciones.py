@@ -148,10 +148,12 @@ def desordenar_letras(palabra: str, dificultad: int = 2) -> str:
     for _ in lista_letras:
         longitud += 1
 
-    for i in range(dificultad):
-        for j in range(longitud):
-            r = random.randint(0, longitud - 1)
-            lista_letras[i], lista_letras[r] = lista_letras[r], lista_letras[i]
+    for pasada in range(dificultad):
+      for posicion_actual in range(longitud):
+        posicion_random = random.randint(0, longitud - 1)
+
+        lista_letras[posicion_actual], lista_letras[posicion_random] = lista_letras[posicion_random], lista_letras[posicion_actual]
+        
 
     desordenada = ""
     indice = 0

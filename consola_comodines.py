@@ -25,7 +25,7 @@ def eliminar_restricciones(vidas: int) -> int:
 
     RETORNO:
         int: Devuelve la misma cantidad de vidas ya que no se descuenta ninguna.
-    """
+    """ 
     print("🚀 Restricciones eliminadas. Tenés un intento libre sin perder vida.")
     vidas_actualizadas = vidas
     return vidas_actualizadas

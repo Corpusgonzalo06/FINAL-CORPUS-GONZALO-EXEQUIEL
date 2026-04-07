@@ -13,7 +13,7 @@ from pygame_estado_juego import crear_estado_inicial
 
 
 def iniciar_informacion_juego():
-    estado = {
+    estado_interfaz = {
         "pantalla_actual": "inicio",
         "usuario_input": "",
         "contrasena_input": "",
@@ -24,7 +24,7 @@ def iniciar_informacion_juego():
         "estado_juego": None,
         "tdah_activo": False
     }
-    return estado
+    return estado_interfaz
 
 def salir_del_juego(usuarios):
     guardar_usuarios(usuarios, "usuarios.json")
@@ -32,29 +32,29 @@ def salir_del_juego(usuarios):
     pygame.quit()
     sys.exit()
 
-def limpiar_inputs(estado, pantalla_destino):
-    estado["usuario_input"] = ""
-    estado["contrasena_input"] = ""
-    estado["mensaje"] = ""
-    estado["pantalla_actual"] = pantalla_destino
+def limpiar_inputs(estado_interfaz, pantalla_destino):
+    estado_interfaz["usuario_input"] = ""
+    estado_interfaz["contrasena_input"] = ""
+    estado_interfaz["mensaje"] = ""
+    estado_interfaz["pantalla_actual"] = pantalla_destino
 
-def eventos_inicio(evento, estado,botones,usuarios):
+def eventos_inicio(evento, estado_interfaz,botones,usuarios):
     if evento.type == pygame.MOUSEBUTTONDOWN:
         if botones["btn_login"].collidepoint(evento.pos):
-         limpiar_inputs(estado, "login")
+         limpiar_inputs(estado_interfaz, "login")
 
         elif botones["btn_registro"].collidepoint(evento.pos):
-         limpiar_inputs(estado, "registro")
+         limpiar_inputs(estado_interfaz, "registro")
 
 
         elif botones["btn_salir_juego"].collidepoint(evento.pos):
             salir_del_juego(usuarios)
 
             
-    return estado
+    return estado_interfaz
 
-def mostrar_error(estado, sonidos, mensaje):
-    estado["mensaje"] = mensaje
+def mostrar_error(estado_interfaz, sonidos, mensaje):
+    estado_interfaz["mensaje"] = mensaje
     reproducir_sonido(sonidos, "mal")
 
 def manejar_teclado_login(evento, estado):
@@ -66,32 +66,32 @@ def manejar_teclado_login(evento, estado):
         estado[campo] += evento.unicode
 
 
-def procesar_login(estado, usuarios, sonidos):
+def procesar_login(estado_interfaz, usuarios, sonidos):
 
-    usuario_input = estado["usuario_input"]
-    contrasena_input = estado["contrasena_input"]
+    usuario_input = estado_interfaz["usuario_input"]
+    contrasena_input = estado_interfaz["contrasena_input"]
 
     if usuario_input in usuarios and usuarios[usuario_input]["contraseña"] == contrasena_input:
 
-        estado["clave_usuario"] = usuario_input
-        estado["usuario_actual"] = usuarios[usuario_input]
-        inicializar_estadisticas(estado["usuario_actual"])
-        estado["pantalla_actual"] = "menu"
-        estado["mensaje"] = ""
+        estado_interfaz["clave_usuario"] = usuario_input
+        estado_interfaz["usuario_actual"] = usuarios[usuario_input]
+        inicializar_estadisticas(estado_interfaz["usuario_actual"])
+        estado_interfaz["pantalla_actual"] = "menu"
+        estado_interfaz["mensaje"] = ""
 
     else:
-        mostrar_error(estado, sonidos, "Usuario o contraseña incorrectos")
+        mostrar_error(estado_interfaz, sonidos, "Usuario o contraseña incorrectos")
 
-def procesar_registro(estado, usuarios, sonidos):
+def procesar_registro(estado_interfaz, usuarios, sonidos):
 
-    usuario_input = estado["usuario_input"]
-    contrasena_input = estado["contrasena_input"]
+    usuario_input = estado_interfaz["usuario_input"]
+    contrasena_input = estado_interfaz["contrasena_input"]
 
     if usuario_input in usuarios:
-        mostrar_error(estado, sonidos, "Ese usuario ya existe")
+        mostrar_error(estado_interfaz, sonidos, "Ese usuario ya existe")
 
     elif usuario_input == "" or contrasena_input == "":
-        mostrar_error(estado, sonidos, "Campos incompletos")
+        mostrar_error(estado_interfaz, sonidos, "Campos incompletos")
 
     else:
         usuarios[usuario_input] = {"contraseña": contrasena_input}
@@ -99,80 +99,81 @@ def procesar_registro(estado, usuarios, sonidos):
         inicializar_estadisticas(usuarios[usuario_input])
         guardar_usuarios(usuarios, "usuarios.json")
 
-        estado["pantalla_actual"] = "login"
-        estado["mensaje"] = "Usuario creado ✔"
+        estado_interfaz["pantalla_actual"] = "login"
+        estado_interfaz["mensaje"] = "Usuario creado ✔"
         reproducir_sonido(sonidos, "bien")
 
-def eventos_login_registro(evento, estado, usuarios, sonidos, botones):
+def eventos_login_registro(evento, estado_interfaz, usuarios, sonidos, botones):
 
     if evento.type == pygame.MOUSEBUTTONDOWN:
 
         if botones["btn_atras"].collidepoint(evento.pos):
-            estado["pantalla_actual"] = "inicio"
-            estado["mensaje"] = ""
+            estado_interfaz["pantalla_actual"] = "inicio"
+            estado_interfaz["mensaje"] = ""
 
         elif botones["rect_usuario"].collidepoint(evento.pos):
-            estado["input_activo"] = "usuario"
+            estado_interfaz["input_activo"] = "usuario"
 
         elif botones["rect_contrasena"].collidepoint(evento.pos):
-            estado["input_activo"] = "contrasena"
+            estado_interfaz["input_activo"] = "contrasena"
 
         elif botones["btn_submit"].collidepoint(evento.pos):
 
-            if estado["pantalla_actual"] == "login":
-                procesar_login(estado, usuarios, sonidos)
+            if estado_interfaz["pantalla_actual"] == "login":
+                procesar_login(estado_interfaz, usuarios, sonidos)
             else:
-                procesar_registro(estado, usuarios, sonidos)
+                procesar_registro(estado_interfaz, usuarios, sonidos)
 
     elif evento.type == pygame.KEYDOWN:
-        manejar_teclado_login(evento, estado)
+        manejar_teclado_login(evento, estado_interfaz)
 
-    return estado
+    return estado_interfaz
 
-def iniciar_partida(estado, lista_bases):
+def iniciar_partida(estado_interfaz, lista_bases):
     palabra_random = seleccionar_palabras_nivel(lista_bases, 1)
     base = palabra_random[0]
 
     # SIN .get()
-    if "accesibilidad" in estado["usuario_actual"]:
-        accesibilidad = estado["usuario_actual"]["accesibilidad"]
+    if "accesibilidad" in estado_interfaz["usuario_actual"]:
+        accesibilidad = estado_interfaz["usuario_actual"]["accesibilidad"]
     else:
         accesibilidad = {}
 
-    accesibilidad["tdah"] = estado["tdah_activo"]
-    estado["usuario_actual"]["accesibilidad"] = accesibilidad
+    accesibilidad["tdah"] = estado_interfaz["tdah_activo"]
+    estado_interfaz["usuario_actual"]["accesibilidad"] = accesibilidad
 
-    estado["estado_juego"] = crear_estado_inicial(
+    estado_interfaz["estado_juego"] = crear_estado_inicial(
         base,
         PALABRAS[base],
         nivel=1,
         accesibilidad=accesibilidad
     )
 
-    estado["estado_juego"]["usuario"] = estado["clave_usuario"]
-    estado["pantalla_actual"] = "jugando"
+    estado_interfaz["estado_juego"]["usuario"] = estado_interfaz["clave_usuario"]
+    estado_interfaz["pantalla_actual"] = "jugando"
 
-    return estado
-def eventos_menu(evento, estado, botones, lista_bases, pantalla):
+    return estado_interfaz
+
+def eventos_menu(evento, estado_interfaz, botones, lista_bases, pantalla):
     if evento.type == pygame.MOUSEBUTTONDOWN:
 
         if botones["btn_tdah"].collidepoint(evento.pos):
-            estado["tdah_activo"] = not estado["tdah_activo"]
+            estado_interfaz["tdah_activo"] = not estado_interfaz["tdah_activo"]
 
         elif botones["btn_jugar"].collidepoint(evento.pos):
-            estado = iniciar_partida(estado, lista_bases)
+            estado_interfaz = iniciar_partida(estado_interfaz, lista_bases)
 
         elif botones["btn_stats"].collidepoint(evento.pos):
-            estado["pantalla_actual"] = mostrar_estadisticas(
-                pantalla, estado["usuario_actual"]
+            estado_interfaz["pantalla_actual"] = mostrar_estadisticas(
+                pantalla, estado_interfaz["usuario_actual"]
             )
 
         elif botones["btn_cerrar_sesion"].collidepoint(evento.pos):
-            estado["usuario_actual"] = None
-            estado["clave_usuario"] = None
-            estado["pantalla_actual"] = "inicio"
+            estado_interfaz["usuario_actual"] = None
+            estado_interfaz["clave_usuario"] = None
+            estado_interfaz["pantalla_actual"] = "inicio"
 
-    return estado
+    return estado_interfaz
 
 def cerrar_partida(estado_juego, usuarios, clave_usuario):
     usuario = usuarios[clave_usuario]
@@ -197,13 +198,13 @@ def cerrar_partida(estado_juego, usuarios, clave_usuario):
     guardar_usuarios(usuarios, "usuarios.json")
     estado_juego["partida_cerrada"] = True
 
-def eventos_jugando(evento, estado, usuarios, sonidos):
+def eventos_jugando(evento, estado_interfaz, usuarios, sonidos):
 
-    estado_juego = estado["estado_juego"]
-    clave_usuario = estado["clave_usuario"]
+    estado_juego = estado_interfaz["estado_juego"]
+    clave_usuario = estado_interfaz["clave_usuario"]
 
     if estado_juego is None:
-        return estado
+        return estado_interfaz
 
     actualizar_tiempo(estado_juego)
 
@@ -250,28 +251,28 @@ def eventos_jugando(evento, estado, usuarios, sonidos):
     if (estado_juego["estado"] in ["ganado", "perdido"] and "botones_fin" in estado_juego):
         for boton in estado_juego["botones_fin"].values():
             if ver_boton_fue_clickeado(boton, evento):
-                estado["pantalla_actual"] = "menu"
-                estado["estado_juego"] = None
+                estado_interfaz["pantalla_actual"] = "menu"
+                estado_interfaz["estado_juego"] = None
 
-    return estado
+    return estado_interfaz
 
 
-def manejar_eventos(estado, usuarios, sonidos, botones, lista_bases, pantalla):
+def manejar_eventos(estado_interfaz, usuarios, sonidos, botones, lista_bases, pantalla):
     for evento in pygame.event.get():
 
         if evento.type == pygame.QUIT:
             salir_del_juego(usuarios)
 
-        if estado["pantalla_actual"] == "inicio":
-            estado = eventos_inicio(evento, estado, botones, usuarios)
+        if estado_interfaz["pantalla_actual"] == "inicio":
+            estado_interfaz = eventos_inicio(evento, estado_interfaz, botones, usuarios)
 
-        elif estado["pantalla_actual"] in ["login", "registro"]:
-            estado = eventos_login_registro(evento, estado, usuarios, sonidos, botones)
+        elif estado_interfaz["pantalla_actual"] in ["login", "registro"]:
+            estado_interfaz = eventos_login_registro(evento, estado_interfaz, usuarios, sonidos, botones)
 
-        elif estado["pantalla_actual"] == "menu":
-            estado = eventos_menu(evento, estado, botones, lista_bases, pantalla)
+        elif estado_interfaz["pantalla_actual"] == "menu":
+            estado_interfaz = eventos_menu(evento, estado_interfaz, botones, lista_bases, pantalla)
 
-        elif estado["pantalla_actual"] == "jugando":
-            estado = eventos_jugando(evento, estado, usuarios, sonidos)
+        elif estado_interfaz["pantalla_actual"] == "jugando":
+            estado_interfaz = eventos_jugando(evento, estado_interfaz, usuarios, sonidos)
 
-    return estado
+    return estado_interfaz
