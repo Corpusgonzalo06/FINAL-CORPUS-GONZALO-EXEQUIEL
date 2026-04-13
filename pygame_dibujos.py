@@ -47,8 +47,8 @@ def oscurecer_pantalla(pantalla, transparencia = 230):
 
 def obtener_centro_x(pantalla):
     ancho, _ = pantalla.get_size()
-    return ancho // 2 - ZONA_CENTRAL_ANCHO // 2
-
+    centro = ancho // 2 - ZONA_CENTRAL_ANCHO // 2
+    return centro
 
 # ==========================
 # AUXILIAR

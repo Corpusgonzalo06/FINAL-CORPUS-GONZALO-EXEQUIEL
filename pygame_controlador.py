@@ -39,7 +39,7 @@ def usar_comodin(estado, nombre_comodin):
         estado["mensaje"] = "⚠️ Comodín no disponible"
         accion_valida = False
 
-    if accion_valida:
+    if accion_valida == True:
 
         if nombre_comodin == "revelar_palabra_base":
             estado["mensaje"] = "💡 Palabra base: " + estado["palabra_base"]

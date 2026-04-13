@@ -1,6 +1,6 @@
 import pygame
 
-def crear_botones_disponibles():
+def crear_elementos_de_interfaz():
     botones = {}
 
     # --- Botones del menú ---

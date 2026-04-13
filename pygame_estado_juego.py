@@ -29,8 +29,8 @@ def configurar_accesibilidad(estado, accesibilidad):
     estado["tdah"] = False
     estado["mensaje_inicial"] = ""
 
-    # SIN .get()
-    if accesibilidad is not None:
+
+    if accesibilidad != None:
         if "tdah" in accesibilidad:
             if accesibilidad["tdah"] == True:
                 estado["tdah"] = True
@@ -60,7 +60,7 @@ def crear_estado_inicial(palabra_base, lista_palabras, nivel=1, puntaje=0, vidas
         "estado": "jugando",
         "errores_nivel": 0,
         "tiempo_inicio": time.time(),
-        "tiempo_limite": 180,  # valor por defecto
+        "tiempo_limite": 180,  
         "tiempo_restante": 180,
         "tiempo_jugado": 0,
         "comodines": crear_comodines_iniciales(),
@@ -77,7 +77,7 @@ def crear_estado_inicial(palabra_base, lista_palabras, nivel=1, puntaje=0, vidas
         "mensaje_inicial": ""
     }
 
-    # aplicamos accesibilidad
+
     configurar_accesibilidad(estado, accesibilidad)
 
     return estado

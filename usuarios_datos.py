@@ -78,9 +78,6 @@ def inicializar_datos_usuario(usuario: dict) -> dict:
         "partidas_jugadas": 0,
         "victorias": 0,
         "derrotas": 0,
-        "accesibilidad": {
-            "tdah": False
-        }
     }
 
     for clave in datos:

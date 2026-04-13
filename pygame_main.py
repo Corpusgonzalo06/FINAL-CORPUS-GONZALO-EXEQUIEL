@@ -9,7 +9,7 @@ from pygame_dibujos import dibujar_juego
 from manejo_aleatoriedad import seleccionar_palabras_nivel
 from pygame_botones import ver_boton_fue_clickeado
 from pygame_sonidos import *
-from pygame_ui import crear_botones_disponibles
+from pygame_ui import crear_elementos_de_interfaz
 from pygame_eventos import *
 from pygame_renderizacion import mostrar_vista_actual
 
@@ -35,7 +35,7 @@ AZUL = (70, 130, 180)
 ROJO = (180, 60, 60)
 
 FONDO_MENU = pygame.image.load("imagen_menu.jpg")
-botones = crear_botones_disponibles()
+botones = crear_elementos_de_interfaz()
 
 usuarios = cargar_usuarios("usuarios.json")
 
